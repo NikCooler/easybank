@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.craftedsw</groupId>
+    <artifactId>bankkata_jbehave</artifactId>
+    <version>1.0</version>
+    <name>bankkata_jbehave</name>
+
+    <modules>
+        <module>domain</module>
+        <module>write-lane</module>
+        <module>read-lane</module>
+        <module>cqrs</module>
+        <module>bank</module>
+    </modules>
+    <packaging>pom</packaging>
+
+    <properties>
+        <maven.compiler.source>11</maven.compiler.source>
+        <maven.compiler.target>11</maven.compiler.target>
+        <file.encoding>UTF-8</file.encoding>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <javalin.version>3.7.0</javalin.version>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>io.javalin</groupId>
+                <artifactId>javalin</artifactId>
+                <version>${javalin.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <profiles>
+        <profile>
+            <id>install_all_modules</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <modules>
+                <module>domain</module>
+                <module>write-lane</module>
+                <module>read-lane</module>
+                <module>cqrs</module>
+                <module>bank</module>
+            </modules>
+        </profile>
+    </profiles>
+</project>
