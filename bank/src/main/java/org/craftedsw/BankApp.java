@@ -1,12 +1,14 @@
 package org.craftedsw;
 
 import io.javalin.Javalin;
+import org.craftedsw.config.AppConfiguration;
 
 /**
  * @author Nikolay Smirnov
  */
 public final class BankApp {
 
+    private static final String SERVER_PORT_PROPERTY = "server.port";
     private Javalin app;
 
     private BankApp() {}
@@ -15,9 +17,9 @@ public final class BankApp {
         if (app != null) {
             return;
         }
-
+        var appCnf = AppConfiguration.getInstance();
         app = Javalin.create();
-        app.start(8080);
+        app.start(appCnf.getIntProperty(SERVER_PORT_PROPERTY));
     }
 
     public static BankApp getInstance() {

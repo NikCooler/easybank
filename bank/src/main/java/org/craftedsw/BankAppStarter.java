@@ -1,7 +1,7 @@
 package org.craftedsw;
 
 /**
- * Money transfer app starter
+ * Bank app starter
  *
  * @author Nikolay Smirnov
  */

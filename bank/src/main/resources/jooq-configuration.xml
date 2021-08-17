@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<configuration xmlns="http://www.jooq.org/xsd/jooq-codegen-3.13.0.xsd">
+    <generator>
+        <database>
+            <name>org.jooq.meta.extensions.liquibase.LiquibaseDatabase</name>
+            <properties>
+                <property>
+                    <key>scripts</key>
+                    <value>bank/src/main/resources/db-changelog.xml</value>
+                </property>
+                <property>
+                    <key>includeLiquibaseTables</key>
+                    <value>true</value>
+                </property>
+                <property>
+                    <key>database.liquibaseSchemaName</key>
+                    <value>PUBLIC</value>
+                </property>
+            </properties>
+
+            <inputCatalog/>
+            <inputSchema>PUBLIC</inputSchema>
+            <outputSchemaToDefault>true</outputSchemaToDefault>
+            <includes>.*</includes>
+            <excludes>DATABASECHANGELOG.*</excludes>
+        </database>
+
+        <generate>
+            <pojos>true</pojos>
+            <globalObjectReferences>false</globalObjectReferences>
+            <fluentSetters>true</fluentSetters>
+            <immutablePojos>false</immutablePojos>
+            <pojosEqualsAndHashCode>true</pojosEqualsAndHashCode>
+        </generate>
+
+        <target>
+            <packageName>org.craftedsw.model</packageName>
+            <directory>src/main/java</directory>
+        </target>
+    </generator>
+</configuration>

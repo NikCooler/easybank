@@ -51,7 +51,7 @@
                         <manifest>
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>lib/</classpathPrefix>
-                            <mainClass>org.craftedsw.BankAppStarter</mainClass>
+                            <mainClass>org.craftedsw.MoneyTransferStarter</mainClass>
                         </manifest>
                         <manifestEntries>
                             <Class-Path>.</Class-Path>
@@ -72,7 +72,7 @@
                             <archive>
                                 <manifest>
                                     <mainClass>
-                                        org.craftedsw.BankAppStarter
+                                        org.craftedsw.MoneyTransferStarter
                                     </mainClass>
                                 </manifest>
                             </archive>

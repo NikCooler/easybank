@@ -11,7 +11,6 @@
     <modules>
         <module>domain</module>
         <module>write-lane</module>
-        <module>read-lane</module>
         <module>cqrs</module>
         <module>bank</module>
     </modules>
@@ -22,6 +21,11 @@
         <maven.compiler.target>11</maven.compiler.target>
         <file.encoding>UTF-8</file.encoding>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+        <cqrs.version>1.0</cqrs.version>
+        <write.lane.version>1.0</write.lane.version>
+        <domain.version>1.0</domain.version>
+
         <javalin.version>3.7.0</javalin.version>
     </properties>
 
@@ -31,6 +35,21 @@
                 <groupId>io.javalin</groupId>
                 <artifactId>javalin</artifactId>
                 <version>${javalin.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.craftedsw</groupId>
+                <artifactId>domain</artifactId>
+                <version>${domain.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.craftedsw</groupId>
+                <artifactId>write-lane</artifactId>
+                <version>${write.lane.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.craftedsw</groupId>
+                <artifactId>cqrs</artifactId>
+                <version>${cqrs.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -44,7 +63,6 @@
             <modules>
                 <module>domain</module>
                 <module>write-lane</module>
-                <module>read-lane</module>
                 <module>cqrs</module>
                 <module>bank</module>
             </modules>
