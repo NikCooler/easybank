@@ -16,6 +16,7 @@ import org.craftedsw.model.DefaultSchema;
 import org.craftedsw.model.tables.records.TransactionRecord;
 import org.craftedsw.type.Currency;
 import org.craftedsw.type.TransactionStatus;
+import org.craftedsw.type.TransactionType;
 import org.jooq.Field;
 import org.jooq.Name;
 import org.jooq.Row9;
@@ -35,7 +36,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Transaction extends TableImpl<TransactionRecord> {
 
-    private static final long serialVersionUID = 1910432997;
+    private static final long serialVersionUID = 200854435;
 
     /**
      * The reference instance of <code>TRANSACTION</code>
@@ -73,7 +74,7 @@ public class Transaction extends TableImpl<TransactionRecord> {
     /**
      * The column <code>TRANSACTION.TYPE</code>.
      */
-    public final TableField<TransactionRecord, String> TYPE = createField(DSL.name("TYPE"), org.jooq.impl.SQLDataType.VARCHAR(30).nullable(false), this, "");
+    public final TableField<TransactionRecord, TransactionType> TYPE = createField(DSL.name("TYPE"), org.jooq.impl.SQLDataType.VARCHAR(30).nullable(false), this, "", new org.jooq.impl.EnumConverter<java.lang.String, org.craftedsw.type.TransactionType>(java.lang.String.class, org.craftedsw.type.TransactionType.class));
 
     /**
      * The column <code>TRANSACTION.CURRENCY</code>.
@@ -172,7 +173,7 @@ public class Transaction extends TableImpl<TransactionRecord> {
     // -------------------------------------------------------------------------
 
     @Override
-    public Row9<TransactionId, UserId, UserId, TransactionStatus, String, Currency, BigDecimal, String, Long> fieldsRow() {
+    public Row9<TransactionId, UserId, UserId, TransactionStatus, TransactionType, Currency, BigDecimal, String, Long> fieldsRow() {
         return (Row9) super.fieldsRow();
     }
 }

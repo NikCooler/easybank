@@ -40,11 +40,11 @@ public class MoneyTransferDetailsDto {
         this.transferTo = transferTo;
     }
 
-    public TransactionStatus getTransferStatus() {
+    public TransactionStatus getTransactionStatus() {
         return transactionStatus;
     }
 
-    public void setTransferStatus(TransactionStatus transactionStatus) {
+    public void setTransactionStatus(TransactionStatus transactionStatus) {
         this.transactionStatus = transactionStatus;
     }
 

@@ -1,6 +1,7 @@
 package org.craftedsw.type;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.math.BigDecimal;
@@ -22,16 +23,22 @@ public final class MoneyAccount {
         return new MoneyAccount(amount);
     }
 
+    public Amount getAmount() {
+        return amount;
+    }
+
+    @JsonIgnore
     public Currency getCurrency() {
         return amount.getCurrency();
     }
 
+    @JsonIgnore
     public BigDecimal getValue() {
         return amount.getValue();
     }
 
     public int compareValueTo(Amount amount) {
-        var currentValue = amount.getValue();
+        var currentValue = this.amount.getValue();
         return currentValue.compareTo(amount.getValue());
     }
 

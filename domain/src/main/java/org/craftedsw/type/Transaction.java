@@ -1,6 +1,7 @@
 package org.craftedsw.type;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.Objects;
@@ -30,8 +31,18 @@ public class Transaction {
         state.transitTo(status);
     }
 
+    @JsonIgnore
     public TransactionStatus getStatus() {
         return state.getStatus();
+    }
+
+    @JsonIgnore
+    public TransactionType getType() {
+        return state.getType();
+    }
+
+    public TransactionState getState() {
+        return state;
     }
 
     public Transfer getTransfer() {
@@ -50,4 +61,5 @@ public class Transaction {
     public int hashCode() {
         return Objects.hash(state, transfer);
     }
+
 }

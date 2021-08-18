@@ -27,7 +27,7 @@ public class MoneyTransferDetailsQueryProcessor extends QueryProcessorBase<Money
         var dto = new MoneyTransferDetailsDto(query.getTransactionId());
         dto.setTransferFrom(rec.getTransferredFrom());
         dto.setTransferTo(rec.getTransferredTo());
-        dto.setTransferStatus(rec.getStatus());
+        dto.setTransactionStatus(rec.getStatus());
         dto.setCurrency(rec.getCurrency());
         dto.setValue(rec.getValue());
         return dto;

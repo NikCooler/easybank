@@ -1,0 +1,14 @@
+{
+  "status": 200,
+  "message": "OK",
+  "payload": {
+    "userId": "11111111-5555-1111-1111-111111111111",
+    "email": "nick.onkin@gmail.com",
+    "moneyAccounts": [
+      {
+        "currency": "EUR",
+        "value": 10.45
+      }
+    ]
+  }
+}

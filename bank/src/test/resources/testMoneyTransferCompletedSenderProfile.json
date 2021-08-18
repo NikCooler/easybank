@@ -1,0 +1,14 @@
+{
+  "status": 200,
+  "message": "OK",
+  "payload": {
+    "userId": "11111111-1111-1111-9999-111111111111",
+    "email": "sender@gmail.com",
+    "moneyAccounts": [
+      {
+        "currency": "EUR",
+        "value": 73.81
+      }
+    ]
+  }
+}

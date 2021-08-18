@@ -45,6 +45,11 @@
                     <userType>org.craftedsw.type.TransactionStatus</userType>
                     <enumConverter>true</enumConverter>
                 </forcedType>
+                <forcedType>
+                    <includeExpression>transaction.type</includeExpression>
+                    <userType>org.craftedsw.type.TransactionType</userType>
+                    <enumConverter>true</enumConverter>
+                </forcedType>
             </forcedTypes>
         </database>
 

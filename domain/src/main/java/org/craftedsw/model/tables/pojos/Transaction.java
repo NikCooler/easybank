@@ -11,6 +11,7 @@ import org.craftedsw.aggregate.TransactionId;
 import org.craftedsw.aggregate.UserId;
 import org.craftedsw.type.Currency;
 import org.craftedsw.type.TransactionStatus;
+import org.craftedsw.type.TransactionType;
 
 
 /**
@@ -19,13 +20,13 @@ import org.craftedsw.type.TransactionStatus;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Transaction implements Serializable {
 
-    private static final long serialVersionUID = -697372635;
+    private static final long serialVersionUID = -564118590;
 
     private TransactionId     transactionId;
     private UserId            transferredFrom;
     private UserId            transferredTo;
     private TransactionStatus status;
-    private String            type;
+    private TransactionType   type;
     private Currency          currency;
     private BigDecimal        value;
     private String            errorMessage;
@@ -50,7 +51,7 @@ public class Transaction implements Serializable {
         UserId            transferredFrom,
         UserId            transferredTo,
         TransactionStatus status,
-        String            type,
+        TransactionType   type,
         Currency          currency,
         BigDecimal        value,
         String            errorMessage,
@@ -103,11 +104,11 @@ public class Transaction implements Serializable {
         return this;
     }
 
-    public String getType() {
+    public TransactionType getType() {
         return this.type;
     }
 
-    public Transaction setType(String type) {
+    public Transaction setType(TransactionType type) {
         this.type = type;
         return this;
     }

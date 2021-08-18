@@ -4,7 +4,7 @@
 This app is used for:
 - Register a user in the bank
 - Register money account for a user ( using preferred currency )
-- Top-up / Withdraw operations
+- Deposit / Withdraw operations
 - Transfer money from one user account to another.
 
 ### 1.1 Used technologies

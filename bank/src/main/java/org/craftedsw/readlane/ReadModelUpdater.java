@@ -64,8 +64,10 @@ public class ReadModelUpdater implements EventStoredIdSubscriber {
                 .set(TRANSACTION.TRANSFERRED_FROM, transfer.getWithdrawFrom())
                 .set(TRANSACTION.TRANSFERRED_TO, transfer.getDepositTo())
                 .set(TRANSACTION.STATUS, transaction.getStatus())
+                .set(TRANSACTION.TYPE, transaction.getType())
                 .set(TRANSACTION.CURRENCY, amount.getCurrency())
                 .set(TRANSACTION.VALUE, amount.getValue())
+                .set(TRANSACTION.EVENT_TIMESTAMP, event.getEventTimestamp())
                 .execute();
     }
 
