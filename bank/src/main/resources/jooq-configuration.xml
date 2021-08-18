@@ -26,9 +26,24 @@
 
             <forcedTypes>
                 <forcedType>
-                    <expression>user_id</expression>
+                    <expression>user_id|transferred_from|transferred_to</expression>
                     <userType>org.craftedsw.aggregate.UserId</userType>
                     <converter>org.craftedsw.aggregate.UserId.JooqUserIdConverter</converter>
+                </forcedType>
+                <forcedType>
+                    <includeExpression>transaction_id</includeExpression>
+                    <userType>org.craftedsw.aggregate.TransactionId</userType>
+                    <converter>org.craftedsw.aggregate.TransactionId.JooqTransactionIdConverter</converter>
+                </forcedType>
+                <forcedType>
+                    <includeExpression>currency</includeExpression>
+                    <userType>org.craftedsw.type.Currency</userType>
+                    <enumConverter>true</enumConverter>
+                </forcedType>
+                <forcedType>
+                    <includeExpression>money_transfer.status</includeExpression>
+                    <userType>org.craftedsw.type.TransferStatus</userType>
+                    <enumConverter>true</enumConverter>
                 </forcedType>
             </forcedTypes>
         </database>

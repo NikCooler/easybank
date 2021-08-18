@@ -11,11 +11,12 @@ import org.jooq.DSLContext;
 import org.jooq.impl.DSL;
 
 import java.util.ArrayDeque;
-import java.util.ArrayList;
 import java.util.ConcurrentModificationException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Queue;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static java.util.Optional.ofNullable;
 
@@ -28,52 +29,69 @@ public class EventStoreServiceImpl implements EventStoreService {
     private final DSLContext           writeModelContext;
     private final EventSavedIdProducer eventSavedIdProducer;
 
-    public EventStoreServiceImpl(
-            EventStoreRepository eventStoreRepository,
-            DSLContext           writeModelContext,
-            EventSavedIdProducer eventSavedIdProducer
-    ) {
+    public EventStoreServiceImpl(EventStoreRepository eventStoreRepository, DSLContext writeModelContext, EventSavedIdProducer eventSavedIdProducer) {
         this.eventStoreRepository = eventStoreRepository;
         this.writeModelContext    = writeModelContext;
         this.eventSavedIdProducer = eventSavedIdProducer;
     }
 
-    public void appendEvents(final List<EventBase> events) {
-        Queue<Long> eventIdQueue = new ArrayDeque<>(events.size());
-        writeModelContext.transaction(txConfig -> {
-            final DSLContext txContext = DSL.using(txConfig);
-            events.forEach(e -> {
-                Integer lastAggregateVersion = ofNullable(eventStoreRepository.getLastAggregateVersion(txContext, e.getAggregateId()))
-                        .map(v -> v + 1)
-                        .orElse(1);
-                if (!Objects.equals(lastAggregateVersion, e.getAggregateVersion())) {
-                    throw new ConcurrentModificationException("Aggregate version is incorrect for aggregate by id [ " + e.getAggregateId()
-                            + " ]. Required [ " + lastAggregateVersion + " ], Actual [ " + e.getAggregateVersion() + "]");
-                }
-                eventIdQueue.add(eventStoreRepository.appendEvent(txContext, e));
-            });
+    public void appendEvents(final List<EventBase<?>> events) {
+        Queue<Long> eventIdsQueue = doInTransaction(txContext -> {
+            return events.stream()
+                    .map(e -> {
+                        validateAggregateVersion(txContext, e);
+                        return eventStoreRepository.appendEvent(txContext, e);
+                    })
+                    .collect(Collectors.toCollection(ArrayDeque::new));
         });
 
-        eventSavedIdProducer.pushEventIdsToQueue(eventIdQueue);
+        eventSavedIdProducer.pushEventIdsToQueue(eventIdsQueue);
     }
 
     @Override
     public <ID extends AggregateIdBase<ID>> AggregateStateBase<ID> retrieveAggregate(final ID aggregateId) {
-        List<EventBase<ID>> events = new ArrayList<>();
-        writeModelContext.transaction(txConfig -> {
-            final DSLContext txContext = DSL.using(txConfig);
+        List<EventBase<ID>> events = doInTransaction(txContext ->
             eventStoreRepository.listEventRecords(txContext, aggregateId)
                     .stream()
                     .map(rec -> (EventStoreRecord) rec)
-                    .map(EventDeserializer::deserialize)
-                    .forEach(events::add);
-        });
+                    .map(EventDeserializer::<ID>deserialize)
+                    .collect(Collectors.toList())
+        );
 
         if (events.isEmpty()) {
             return null;
         }
-        AggregateStateBase<ID> aggregateState = events.get(0).getAggregateId().newInstanceState();
+        return buildAggregateState(events);
+    }
+
+    private <ID extends AggregateIdBase<ID>> AggregateStateBase<ID> buildAggregateState(List<EventBase<ID>> events) {
+        EventBase<ID> firstEvent = events.get(0);
+        ID aggregateId = firstEvent.getAggregateId();
+        AggregateStateBase<ID> aggregateState = aggregateId.newInstanceState();
         aggregateState.applyEvents(events);
+
         return aggregateState;
+    }
+
+    private Integer getLastAggregateVersion(DSLContext txContext, AggregateIdBase<?> aggregateId) {
+        return ofNullable(eventStoreRepository.getLastAggregateVersion(txContext, aggregateId))
+                .map(v -> v + 1)
+                .orElse(1);
+    }
+
+    private void validateAggregateVersion(DSLContext txContext, EventBase e) {
+        Integer lastAggregateVersion = getLastAggregateVersion(txContext, e.getAggregateId());
+        if (!Objects.equals(lastAggregateVersion, e.getAggregateVersion())) {
+            throw new ConcurrentModificationException("Aggregate version is incorrect for aggregate by id [ " + e.getAggregateId()
+                    + " ]. Required [ " + lastAggregateVersion + " ], Actual [ " + e.getAggregateVersion() + "]");
+        }
+    }
+
+    private <T> T doInTransaction(Function<DSLContext, T> transactionFunc) {
+        return writeModelContext.transactionResult(txConfig -> {
+            var txContext = DSL.using(txConfig);
+
+            return transactionFunc.apply(txContext);
+        });
     }
 }

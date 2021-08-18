@@ -1,27 +1,16 @@
 package org.craftedsw;
 
 import io.javalin.Javalin;
-import io.javalin.plugin.json.JavalinJackson;
-import org.craftedsw.aggregate.UserId;
-import org.craftedsw.config.AppConfiguration;
-import org.craftedsw.config.DBConfig;
-import org.craftedsw.controller.UserController;
+import org.craftedsw.config.*;
 import org.craftedsw.readlane.ReadModelUpdater;
-import org.craftedsw.service.user.profile.UserProfileQuery;
-import org.craftedsw.service.user.profile.UserProfileQueryProcessor;
-import org.craftedsw.service.user.profile.UserProfileQueryValidator;
-import org.craftedsw.service.user.register.UserRegisterCommand;
-import org.craftedsw.service.user.register.UserRegisterCommandProcessor;
-import org.craftedsw.service.user.register.UserRegisterCommandValidator;
 import org.craftedsw.writelane.EventStoreServiceImpl;
 import org.craftedsw.writelane.eventbus.EventSavedIdDispatcher;
 import org.craftedsw.writelane.eventbus.EventSavedIdProducer;
 import org.craftedsw.writelane.repository.EventStoreRepositoryImpl;
 import org.jooq.DSLContext;
 
+import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
-
-import static org.craftedsw.config.AppEndpoint.*;
 
 /**
  * Bank app
@@ -48,33 +37,23 @@ public final class BankApp {
         var appCnf = AppConfiguration.getInstance();
         var dslContext = DBConfig.getInstance().initDBContext();
         var producer = initEventSavedIdEventBus(dslContext);
-
         var eventStoreService = new EventStoreServiceImpl(new EventStoreRepositoryImpl(), dslContext, producer);
-
-        var userController = new UserController(
-                new UserRegisterCommandProcessor(eventStoreService, new UserRegisterCommandValidator()),
-                new UserProfileQueryProcessor(dslContext, new UserProfileQueryValidator(dslContext))
-        );
-
-        app.post(POST_USER_REGISTER,
-                ctx -> {
-                    var command = new UserRegisterCommand(UserId.valueOf(ctx.pathParam("userId")));
-                    command = JavalinJackson.getObjectMapper().readerForUpdating(command).readValue(ctx.body());
-                    ctx.json(userController.register(command));
-                }
-        );
-
-        app.get(GET_USER_PROFILE,
-                ctx -> ctx.json(userController.userProfile(new UserProfileQuery(ctx.pathParam("userId"))))
-        );
+        initControllers(eventStoreService, dslContext);
 
         app.start(appCnf.getIntProperty(SERVER_PORT_PROPERTY));
+    }
+
+    private void initControllers(EventStoreServiceImpl eventStoreService, DSLContext dslContext) {
+        List.of(
+                new UserControllerConfiguration(app, eventStoreService, dslContext),
+                new MoneyTransferControllerConfiguration(app, eventStoreService, dslContext)
+        ).forEach(ControllerConfiguration::init);
     }
 
     private static EventSavedIdProducer initEventSavedIdEventBus(DSLContext readModelContext) {
         var savedEventIds = new LinkedBlockingQueue<Long>();
 
-        var producer   = new EventSavedIdProducer(savedEventIds);
+        var producer = new EventSavedIdProducer(savedEventIds);
         var dispatcher = new EventSavedIdDispatcher(savedEventIds);
 
         dispatcher.registerSubscriber(new ReadModelUpdater(readModelContext));

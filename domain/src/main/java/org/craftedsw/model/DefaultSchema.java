@@ -8,6 +8,8 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.craftedsw.model.tables.EventStore;
+import org.craftedsw.model.tables.MoneyAccount;
+import org.craftedsw.model.tables.MoneyTransfer;
 import org.craftedsw.model.tables.User;
 import org.jooq.Catalog;
 import org.jooq.Table;
@@ -20,7 +22,7 @@ import org.jooq.impl.SchemaImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class DefaultSchema extends SchemaImpl {
 
-    private static final long serialVersionUID = 184245995;
+    private static final long serialVersionUID = -1905873089;
 
     /**
      * The reference instance of <code>DEFAULT_SCHEMA</code>
@@ -44,6 +46,8 @@ public class DefaultSchema extends SchemaImpl {
     public final List<Table<?>> getTables() {
         return Arrays.<Table<?>>asList(
             EventStore.EVENT_STORE,
+            MoneyAccount.MONEY_ACCOUNT,
+            MoneyTransfer.MONEY_TRANSFER,
             User.USER);
     }
 }

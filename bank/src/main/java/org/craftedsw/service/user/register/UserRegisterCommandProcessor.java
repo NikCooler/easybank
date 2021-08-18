@@ -22,7 +22,7 @@ public class UserRegisterCommandProcessor extends CommandProcessorBase<UserRegis
     }
 
     @Override
-    protected List<EventBase> buildEvents(UserRegisterCommand command, AggregateStateBase<UserId> aggregateState) {
+    protected List<EventBase<?>> buildEvents(UserRegisterCommand command, AggregateStateBase<UserId> aggregateState) {
         var registeredEvent = new UserRegisteredEvent(command.getAggregateId());
         registeredEvent.setEmail(command.getEmail());
         registeredEvent.setAggregateVersion(1);

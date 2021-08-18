@@ -39,4 +39,42 @@
         </createTable>
     </changeSet>
 
+    <changeSet id="17-08-2021-create-money_account-table" author="nikolay.smirnov">
+        <createTable tableName="money_account">
+            <column name="user_id" type="varchar(36)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="currency" type="varchar(3)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="value" type="DECIMAL(10,2)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="17-08-2021-create-money_transfer-table" author="nikolay.smirnov">
+        <createTable tableName="money_transfer">
+            <column name="transaction_id" type="varchar(36)">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="transferred_from" type="varchar(36)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="transferred_to" type="varchar(36)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" type="varchar(30)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="currency" type="varchar(3)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="value" type="DECIMAL(10,2)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="error_message" type="varchar(300)"/>
+        </createTable>
+    </changeSet>
+
 </databaseChangeLog>

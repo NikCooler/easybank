@@ -1,5 +1,6 @@
 package org.craftedsw.service.user.profile;
 
+import org.craftedsw.aggregate.UserId;
 import org.craftedsw.cqrs.query.Query;
 
 /**
@@ -7,9 +8,9 @@ import org.craftedsw.cqrs.query.Query;
  */
 public class UserProfileQuery implements Query {
 
-    public final String userId;
+    public final UserId userId;
 
-    public UserProfileQuery(String userId) {
+    public UserProfileQuery(UserId userId) {
         this.userId = userId;
     }
 }

@@ -14,7 +14,7 @@ public interface EventStoreService {
     /**
      * Add event into the Event Store table
      */
-    void appendEvents(final List<EventBase> events);
+    void appendEvents(final List<EventBase<?>> events);
 
     <ID extends AggregateIdBase<ID>> AggregateStateBase<ID> retrieveAggregate(ID aggregateId);
 

@@ -1,6 +1,7 @@
 package org.craftedsw.util;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.craftedsw.aggregate.AggregateIdBase;
 import org.craftedsw.event.EventBase;
 import org.craftedsw.model.tables.records.EventStoreRecord;
 
@@ -23,7 +24,7 @@ public final class EventDeserializer {
     /**
      * Deserialize DB record form {@link EventStoreRecord} to derived class of type {@link EventBase}
      */
-    public static EventBase deserialize(EventStoreRecord rec) {
+    public static <ID extends AggregateIdBase<ID>> EventBase<ID> deserialize(EventStoreRecord rec) {
         return doWithRuntimeException(() -> {
             String className = rec.getEventType();
             Class<?> clazz = forName(className);
@@ -33,7 +34,7 @@ public final class EventDeserializer {
                     .orElseThrow();
             Object abstractEvent = constructor
                     .newInstance(rec.getEventId(), rec.getAggregateId(), rec.getAggregateVersion(), rec.getEventTimestamp());
-            return OM.readerForUpdating(abstractEvent).readValue(rec.getEventData());
+            return OM.readerForUpdating(abstractEvent).<EventBase<ID>>readValue(rec.getEventData());
         });
     }
 

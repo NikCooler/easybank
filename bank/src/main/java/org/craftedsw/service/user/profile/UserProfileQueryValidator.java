@@ -1,6 +1,5 @@
 package org.craftedsw.service.user.profile;
 
-import org.craftedsw.aggregate.UserId;
 import org.craftedsw.cqrs.query.QueryValidationException;
 import org.craftedsw.cqrs.query.QueryValidator;
 import org.jooq.DSLContext;
@@ -24,7 +23,7 @@ public class UserProfileQueryValidator implements QueryValidator<UserProfileQuer
         boolean userExists = readModelContext.fetchExists(
                 DSL.select(DSL.one())
                         .from(USER)
-                        .where(USER.USER_ID.eq(UserId.valueOf(query.userId))));
+                        .where(USER.USER_ID.eq(query.userId)));
         if (!userExists) {
             throw new QueryValidationException("User doesn't exist by id [ " + query.userId + " ]");
         }
