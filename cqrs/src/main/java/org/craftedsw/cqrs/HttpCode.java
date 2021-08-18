@@ -1,4 +1,4 @@
-package org.craftedsw.type;
+package org.craftedsw.cqrs;
 
 /**
  * @author Nikolay Smirnov

@@ -13,6 +13,7 @@ This app is used for:
 - H2 in-memory DB [`H2 DB`](https://www.h2database.com/html/main.html)
 - Javalin [`Simple web framework`](https://javalin.io)
 - Liquibase [`DB managger`](https://www.liquibase.org/)
+- Jooq [`Light DB-mapping software`](https://www.jooq.org/)
 
 ### 1.2 Used design principles
 

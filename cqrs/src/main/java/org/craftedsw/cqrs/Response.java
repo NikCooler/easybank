@@ -1,7 +1,5 @@
 package org.craftedsw.cqrs;
 
-import org.craftedsw.type.HttpCode;
-
 /**
  * @author Nikolay Smirnov
  */

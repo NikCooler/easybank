@@ -23,6 +23,14 @@
             <outputSchemaToDefault>true</outputSchemaToDefault>
             <includes>.*</includes>
             <excludes>DATABASECHANGELOG.*</excludes>
+
+            <forcedTypes>
+                <forcedType>
+                    <expression>user_id</expression>
+                    <userType>org.craftedsw.aggregate.UserId</userType>
+                    <converter>org.craftedsw.aggregate.UserId.JooqUserIdConverter</converter>
+                </forcedType>
+            </forcedTypes>
         </database>
 
         <generate>
@@ -35,7 +43,7 @@
 
         <target>
             <packageName>org.craftedsw.model</packageName>
-            <directory>src/main/java</directory>
+            <directory>../domain/src/main/java</directory>
         </target>
     </generator>
 </configuration>

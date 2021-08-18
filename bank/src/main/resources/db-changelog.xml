@@ -13,10 +13,27 @@
             <column name="aggregate_id" type="char(36)">
                 <constraints nullable="false"/>
             </column>
+            <column name="aggregate_version" type="int(11)">
+                <constraints nullable="false"/>
+            </column>
             <column name="event_type" type="varchar(200)">
                 <constraints nullable="false"/>
             </column>
             <column name="event_data" type="varchar(4000)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="event_timestamp" type="bigint(20)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="17-08-2021-create-user-table" author="nikolay.smirnov">
+        <createTable tableName="user">
+            <column name="user_id" type="varchar(36)">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="email" type="varchar(200)">
                 <constraints nullable="false"/>
             </column>
         </createTable>

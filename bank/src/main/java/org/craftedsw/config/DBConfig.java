@@ -4,6 +4,7 @@ import liquibase.Liquibase;
 import liquibase.database.Database;
 import liquibase.database.DatabaseFactory;
 import liquibase.database.jvm.JdbcConnection;
+import liquibase.exception.DatabaseException;
 import liquibase.resource.FileSystemResourceAccessor;
 import org.h2.jdbcx.JdbcConnectionPool;
 import org.h2.jdbcx.JdbcDataSource;
@@ -12,10 +13,12 @@ import org.jooq.SQLDialect;
 import org.jooq.conf.Settings;
 import org.jooq.impl.DSL;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.sql.Connection;
+import java.util.Objects;
 
 /**
  * Configure H2 in-memory DB.
@@ -30,51 +33,69 @@ public final class DBConfig {
     private final JdbcDataSource     dataSource;
 
     private DBConfig() {
-        AppConfiguration appConf = AppConfiguration.getInstance();
+        var appConf = AppConfiguration.getInstance();
 
-        JdbcDataSource dataSource = new JdbcDataSource();
-        dataSource.setURL(appConf.getProperty("db.url"));
-        dataSource.setUser(appConf.getProperty("db.user"));
-        dataSource.setPassword(appConf.getProperty("db.password"));
-
-        JdbcConnectionPool connectionPool = JdbcConnectionPool.create(dataSource);
-        connectionPool.setMaxConnections(appConf.getIntProperty("db.connection.pool.max.connections"));
-
-        this.connectionPool = connectionPool;
-        this.dataSource     = dataSource;
+        this.dataSource = createDatasource(appConf);
+        this.connectionPool = createConnectionPool(appConf);
 
         executeLiquibaseChangeSets();
     }
 
     public DSLContext initDBContext() {
         try {
-            Settings settings = new Settings();
+            var settings = new Settings();
             settings.withRenderSchema(false);
 
             return DSL.using(dataSource, SQLDialect.H2, settings);
         } catch (Exception ex) {
-            // NOPE
+            throw new AppInitializeException(ex.getMessage());
         }
-        return null;
     }
 
     private void executeLiquibaseChangeSets() {
+        try (var con = connectionPool.getConnection()) {
+            var database = getDatabase(con);
+            var pathToChaneSet = pathToDbChangeSet();
 
-        try (Connection con = connectionPool.getConnection()) {
-            Database database = DatabaseFactory.getInstance().findCorrectDatabaseImplementation(new JdbcConnection(con));
-
-            Path temp = Files.createTempFile("resource-db-changelog", ".xml");
-            Files.copy(getClass().getClassLoader().getResourceAsStream("db-changelog.xml"), temp, StandardCopyOption.REPLACE_EXISTING);
-
-            Liquibase liquibase = new Liquibase(
-                    temp.toString(),
-                    new FileSystemResourceAccessor(),
-                    database
-            );
+            var liquibase = new Liquibase(pathToChaneSet, new FileSystemResourceAccessor(), database);
             liquibase.update("");
         } catch (Exception ex) {
-            // NOPE
+            throw new AppInitializeException(ex.getMessage());
         }
+    }
+
+    private JdbcDataSource createDatasource(AppConfiguration appConf) {
+        var dataSource = new JdbcDataSource();
+
+        dataSource.setURL(appConf.getProperty("db.url"));
+        dataSource.setUser(appConf.getProperty("db.user"));
+        dataSource.setPassword(appConf.getProperty("db.password"));
+
+        return dataSource;
+    }
+
+    private JdbcConnectionPool createConnectionPool(AppConfiguration appConf) {
+        var connectionPool = JdbcConnectionPool.create(dataSource);
+        connectionPool.setMaxConnections(appConf.getIntProperty("db.connection.pool.max.connections"));
+        return connectionPool;
+    }
+
+    private Database getDatabase(Connection con) throws DatabaseException {
+        var databaseFactory = DatabaseFactory.getInstance();
+        return databaseFactory.findCorrectDatabaseImplementation(new JdbcConnection(con));
+    }
+
+    private String pathToDbChangeSet() throws IOException {
+        Path temp = Files.createTempFile("resource-db-changelog", ".xml");
+        var classLoader = getClass().getClassLoader();
+        var changeSetInputStream = classLoader.getResourceAsStream("db-changelog.xml");
+
+        if (Objects.isNull(changeSetInputStream)) {
+            throw new AppInitializeException("DB change sets file is not found 'db-changelog.xml'");
+        }
+        Files.copy(changeSetInputStream, temp, StandardCopyOption.REPLACE_EXISTING);
+
+        return temp.toString();
     }
 
     public static DBConfig getInstance() {

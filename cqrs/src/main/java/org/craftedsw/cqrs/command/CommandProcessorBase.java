@@ -3,9 +3,9 @@ package org.craftedsw.cqrs.command;
 import org.craftedsw.aggregate.AggregateIdBase;
 import org.craftedsw.aggregate.AggregateLockingCache;
 import org.craftedsw.aggregate.AggregateStateBase;
+import org.craftedsw.cqrs.HttpCode;
 import org.craftedsw.cqrs.Response;
 import org.craftedsw.event.EventBase;
-import org.craftedsw.type.HttpCode;
 import org.craftedsw.writelane.EventStoreService;
 
 import java.util.List;
@@ -21,13 +21,15 @@ public abstract class CommandProcessorBase<CMD extends CommandBase<ID>, ID exten
     protected final EventStoreService     eventStoreService;
     protected final CommandValidator<CMD> commandValidator;
 
-    public CommandProcessorBase(
-            EventStoreService     eventStoreService,
-            CommandValidator<CMD> commandValidator
-    ) {
+    public CommandProcessorBase(EventStoreService eventStoreService, CommandValidator<CMD> commandValidator) {
         this.eventStoreService = eventStoreService;
         this.commandValidator  = commandValidator;
     }
+
+    /**
+     * Can be override to implement specific pre-processing logic
+     */
+    protected void beforeCommandExecution(CMD command) {}
 
     /**
      *
@@ -38,8 +40,10 @@ public abstract class CommandProcessorBase<CMD extends CommandBase<ID>, ID exten
         try {
             command.tryLock();
 
+            beforeCommandExecution(command);
+
             AggregateStateBase<ID> aggregateState = eventStoreService.retrieveAggregate(command.getAggregateId());
-            commandValidator.validate(command, aggregateState);
+            validateCommand(command, aggregateState);
 
             List<EventBase> newEvents = buildEvents(command, aggregateState);
             eventStoreService.appendEvents(newEvents);
@@ -50,7 +54,7 @@ public abstract class CommandProcessorBase<CMD extends CommandBase<ID>, ID exten
             return Response.of(HttpCode.BAD_REQUEST.getCode(), ex.getMessage());
         } finally {
             afterCommandExecution(command);
-            AggregateLockingCache.getInstance().unlock(command.getAggregateId());
+            AggregateLockingCache.getInstance().unlockAll(command.getAggregateId());
         }
     }
 

@@ -1,7 +1,7 @@
 package org.craftedsw.cqrs.query;
 
+import org.craftedsw.cqrs.HttpCode;
 import org.craftedsw.cqrs.Response;
-import org.craftedsw.type.HttpCode;
 import org.jooq.DSLContext;
 
 /**
@@ -15,10 +15,7 @@ public abstract class QueryProcessorBase<Q extends Query, DTO> {
     protected final DSLContext      readModelContext;
     private final QueryValidator<Q> queryValidator;
 
-    protected QueryProcessorBase(
-            DSLContext        readModelContext,
-            QueryValidator<Q> queryValidator
-    ) {
+    protected QueryProcessorBase(DSLContext readModelContext, QueryValidator<Q> queryValidator) {
         this.readModelContext = readModelContext;
         this.queryValidator   = queryValidator;
     }

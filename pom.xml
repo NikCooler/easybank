@@ -27,6 +27,16 @@
         <domain.version>1.0</domain.version>
 
         <javalin.version>3.7.0</javalin.version>
+        <slf4j.version>1.8.0-beta4</slf4j.version>
+        <jackson.version>2.10.1</jackson.version>
+        <h2.version>1.4.200</h2.version>
+        <jooq.version>3.13.1</jooq.version>
+        <liquibase.version>3.8.7</liquibase.version>
+
+        <unirest.java.version>3.4.00</unirest.java.version>
+        <assertj.core.version>3.11.1</assertj.core.version>
+        <mockito.version>3.2.4</mockito.version>
+        <junit.version>4.12</junit.version>
     </properties>
 
     <dependencyManagement>
@@ -37,19 +47,79 @@
                 <version>${javalin.version}</version>
             </dependency>
             <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-simple</artifactId>
+                <version>${slf4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId>
+                <version>${slf4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-databind</artifactId>
+                <version>${jackson.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.h2database</groupId>
+                <artifactId>h2</artifactId>
+                <version>${h2.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.liquibase</groupId>
+                <artifactId>liquibase-core</artifactId>
+                <version>${liquibase.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.jooq</groupId>
+                <artifactId>jooq</artifactId>
+                <version>${jooq.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.jooq</groupId>
+                <artifactId>jooq-meta-extensions</artifactId>
+                <version>${jooq.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>junit</groupId>
+                <artifactId>junit</artifactId>
+                <version>${junit.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.mockito</groupId>
+                <artifactId>mockito-core</artifactId>
+                <version>${mockito.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.konghq</groupId>
+                <artifactId>unirest-java</artifactId>
+                <version>${unirest.java.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.assertj</groupId>
+                <artifactId>assertj-core</artifactId>
+                <version>${assertj.core.version}</version>
+                <scope>test</scope>
+            </dependency>
+
+            <dependency>
                 <groupId>org.craftedsw</groupId>
                 <artifactId>domain</artifactId>
                 <version>${domain.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.craftedsw</groupId>
-                <artifactId>write-lane</artifactId>
-                <version>${write.lane.version}</version>
+                <artifactId>cqrs</artifactId>
+                <version>${cqrs.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.craftedsw</groupId>
-                <artifactId>cqrs</artifactId>
-                <version>${cqrs.version}</version>
+                <artifactId>write-lane</artifactId>
+                <version>${write.lane.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
