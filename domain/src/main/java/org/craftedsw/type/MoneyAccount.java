@@ -11,25 +11,36 @@ import java.util.Objects;
  */
 public final class MoneyAccount {
 
-    private final Currency currency;
-    private final BigDecimal value;
+    private final Amount amount;
 
-    private MoneyAccount(Currency currency, BigDecimal value) {
-        this.currency = currency;
-        this.value    = value;
+    private MoneyAccount(Amount amount) {
+        this.amount = amount;
     }
 
     @JsonCreator
-    public static MoneyAccount of(@JsonProperty("currency") Currency currency, @JsonProperty("value") BigDecimal value) {
-        return new MoneyAccount(currency, value);
+    public static MoneyAccount of(@JsonProperty("amount") Amount amount) {
+        return new MoneyAccount(amount);
     }
 
     public Currency getCurrency() {
-        return currency;
+        return amount.getCurrency();
     }
 
     public BigDecimal getValue() {
-        return value;
+        return amount.getValue();
+    }
+
+    public int compareValueTo(Amount amount) {
+        var currentValue = amount.getValue();
+        return currentValue.compareTo(amount.getValue());
+    }
+
+    public void withdraw(Amount withdrawAmount) {
+        amount.withdraw(withdrawAmount);
+    }
+
+    public void deposit(Amount depositAmount) {
+        amount.deposit(depositAmount);
     }
 
     @Override
@@ -37,12 +48,11 @@ public final class MoneyAccount {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         MoneyAccount that = (MoneyAccount) o;
-        return currency == that.currency &&
-                value.equals(that.value);
+        return amount.equals(that.amount);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(currency, value);
+        return Objects.hash(amount);
     }
 }

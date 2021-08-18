@@ -3,7 +3,7 @@ package org.craftedsw.type;
 /**
  * @author Nikolay Smirnov
  */
-public enum TransferStatus {
+public enum TransactionStatus {
 
     PROCESSING,
     COMPLETED,

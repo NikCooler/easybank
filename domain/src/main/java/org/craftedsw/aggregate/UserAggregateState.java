@@ -1,12 +1,12 @@
 package org.craftedsw.aggregate;
 
 import org.craftedsw.event.MoneyAccountCreatedEvent;
-import org.craftedsw.event.MoneyToppedUpEvent;
-import org.craftedsw.event.MoneyWithdrawnEvent;
+import org.craftedsw.event.DepositEvent;
+import org.craftedsw.event.WithdrawnEvent;
 import org.craftedsw.event.UserRegisteredEvent;
 import org.craftedsw.type.Currency;
+import org.craftedsw.type.MoneyAccount;
 
-import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -19,7 +19,7 @@ public class UserAggregateState extends AggregateStateBase<UserId> {
 
     private String email;
 
-    private final Map<Currency, BigDecimal> moneyAccounts = new HashMap<>();
+    private final Map<Currency, MoneyAccount> accounts = new HashMap<>();
 
     UserAggregateState(UserId aggregateId) {
         super(aggregateId);
@@ -30,20 +30,20 @@ public class UserAggregateState extends AggregateStateBase<UserId> {
     }
 
     public void apply(MoneyAccountCreatedEvent event) {
-        moneyAccounts.put(
-                event.getMoneyAccount().getCurrency(),
-                event.getMoneyAccount().getValue()
-        );
+        var moneyAccount = event.getMoneyAccount();
+        this.accounts.put(moneyAccount.getCurrency(), moneyAccount);
     }
 
-    public void apply(MoneyWithdrawnEvent event) {
-        BigDecimal val = moneyAccounts.get(event.getCurrency());
-        moneyAccounts.put(event.getCurrency(), val.min(event.getValue()));
+    public void apply(WithdrawnEvent event) {
+        var withdrawAmount = event.getAmount();
+        var account = accounts.get(withdrawAmount.getCurrency());
+        account.withdraw(withdrawAmount);
     }
 
-    public void apply(MoneyToppedUpEvent event) {
-        BigDecimal val = moneyAccounts.get(event.getCurrency());
-        moneyAccounts.put(event.getCurrency(), val.add(event.getValue()));
+    public void apply(DepositEvent event) {
+        var depositAmount = event.getAmount();
+        var account = accounts.get(depositAmount.getCurrency());
+        account.deposit(depositAmount);
     }
 
     //
@@ -55,7 +55,7 @@ public class UserAggregateState extends AggregateStateBase<UserId> {
         return email;
     }
 
-    public Map<Currency, BigDecimal> getMoneyAccounts() {
-        return unmodifiableMap(moneyAccounts);
+    public Map<Currency, MoneyAccount> getAccounts() {
+        return unmodifiableMap(accounts);
     }
 }

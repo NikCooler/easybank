@@ -4,11 +4,11 @@ import org.craftedsw.aggregate.AggregateStateBase;
 import org.craftedsw.aggregate.UserAggregateState;
 import org.craftedsw.cqrs.command.CommandValidationException;
 import org.craftedsw.cqrs.command.CommandValidator;
-import org.craftedsw.type.Currency;
+import org.craftedsw.service.moneytransfer.MoneyTransferValidator;
+import org.craftedsw.type.Amount;
 import org.craftedsw.writelane.EventStoreService;
 
 import java.math.BigDecimal;
-import java.util.Map;
 import java.util.Objects;
 import java.util.function.Predicate;
 
@@ -18,9 +18,11 @@ import java.util.function.Predicate;
 public class MoneyTransferRequestCommandValidator implements CommandValidator<MoneyTransferRequestCommand> {
 
     private final EventStoreService eventStoreService;
+    private final MoneyTransferValidator transferValidator;
 
-    public MoneyTransferRequestCommandValidator(EventStoreService eventStoreService) {
+    public MoneyTransferRequestCommandValidator(EventStoreService eventStoreService, MoneyTransferValidator transferValidator) {
         this.eventStoreService = eventStoreService;
+        this.transferValidator = transferValidator;
     }
 
     @Override
@@ -35,18 +37,18 @@ public class MoneyTransferRequestCommandValidator implements CommandValidator<Mo
         validate(cmd -> Objects.isNull(cmd.getCurrency()),     command, "Field 'currency' must NOT be empty");
         validate(cmd -> Objects.isNull(cmd.getValue()),        command, "Field 'value' must NOT be empty");
 
-        var userFromState = (UserAggregateState) eventStoreService.retrieveAggregate(command.getTransferFrom());
-        var userToState   = (UserAggregateState) eventStoreService.retrieveAggregate(command.getTransferTo());
+        var userSenderState = (UserAggregateState) eventStoreService.retrieveAggregate(command.getTransferFrom());
+        var userReceiverState = (UserAggregateState) eventStoreService.retrieveAggregate(command.getTransferTo());
 
-        if (Objects.isNull(userFromState)) {
+        if (Objects.isNull(userSenderState)) {
             throw new CommandValidationException("User 'from' is not found by id [ " + command.getTransferFrom() + " ]");
         }
 
-        if (Objects.isNull(userToState)) {
+        if (Objects.isNull(userReceiverState)) {
             throw new CommandValidationException("User 'to' is not found by id [ " + command.getTransferTo() + " ]");
         }
 
-        if (userFromState.getAggregateId().equals(userToState.getAggregateId())) {
+        if (userSenderState.getAggregateId().equals(userReceiverState.getAggregateId())) {
             throw new CommandValidationException("Users are the same!");
         }
 
@@ -58,21 +60,8 @@ public class MoneyTransferRequestCommandValidator implements CommandValidator<Mo
             throw new CommandValidationException("Money amount is in incorrect format. Must be '#.##'");
         }
 
-        String prefixErrorMessage = "Money transfer request [ " + command.getAggregateId() + " ] failed due to ";
-        Map<Currency, BigDecimal> userFromAccounts = userFromState.getMoneyAccounts();
-        if (!userFromAccounts.containsKey(command.getCurrency())) {
-            throw new CommandValidationException(prefixErrorMessage + "'user from' [ " + userFromState.getAggregateId() + " ] " +
-                    "doesn't have money account [ '" + command.getCurrency() + "' ]");
-        }
-        BigDecimal userFromMoney = userFromAccounts.get(command.getCurrency());
-        if (userFromMoney.compareTo(command.getValue()) < 0) {
-            throw new CommandValidationException(prefixErrorMessage + "'user from' [ " + userFromState.getAggregateId() + " ] " +
-                    "doesn't have enough money [ '" + command.getCurrency() + "' ]");
-        }
-        if (!userToState.getMoneyAccounts().containsKey(command.getCurrency())) {
-            throw new CommandValidationException(prefixErrorMessage + "'user to' [ " + userToState.getAggregateId() + " ] " +
-                    "doesn't have money account [ '" + command.getCurrency() + "' ]");
-        }
+        var amount = Amount.of(command.getCurrency(), command.getValue());
+        transferValidator.validateTransfer(command.getAggregateId(), userSenderState, userReceiverState, amount);
         return true;
     }
 

@@ -5,7 +5,8 @@ import org.craftedsw.cqrs.query.QueryValidator;
 import org.jooq.DSLContext;
 import org.jooq.impl.DSL;
 
-import static org.craftedsw.model.tables.MoneyTransfer.MONEY_TRANSFER;
+import static java.lang.String.format;
+import static org.craftedsw.model.tables.Transaction.TRANSACTION;
 
 /**
  * @author Nikolay Smirnov
@@ -22,10 +23,10 @@ public class MoneyTransferDetailsQueryValidator implements QueryValidator<MoneyT
     public boolean isValid(MoneyTransferDetailsQuery query) {
         boolean moneyTransferExists = readModelContext.fetchExists(
                 DSL.select(DSL.one())
-                        .from(MONEY_TRANSFER)
-                        .where(MONEY_TRANSFER.TRANSACTION_ID.eq(query.getTransactionId())));
+                        .from(TRANSACTION)
+                        .where(TRANSACTION.TRANSACTION_ID.eq(query.getTransactionId())));
         if (!moneyTransferExists) {
-            throw new QueryValidationException("Money transfer doesn't exist by id [ " + query.getTransactionId() + " ]");
+            throw new QueryValidationException(format("Money transfer doesn't exist by id [ %s ]", query.getTransactionId()));
         }
         return true;
     }

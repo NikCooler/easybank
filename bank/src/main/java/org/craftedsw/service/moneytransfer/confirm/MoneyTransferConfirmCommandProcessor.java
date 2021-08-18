@@ -4,7 +4,7 @@ import org.craftedsw.aggregate.*;
 import org.craftedsw.cqrs.command.CommandProcessorBase;
 import org.craftedsw.cqrs.command.CommandValidationException;
 import org.craftedsw.event.*;
-import org.craftedsw.type.TransferStatus;
+import org.craftedsw.type.TransactionStatus;
 import org.craftedsw.writelane.EventStoreService;
 
 import java.util.ArrayList;
@@ -35,9 +35,11 @@ public class MoneyTransferConfirmCommandProcessor extends CommandProcessorBase<M
      */
     @Override
     protected void beforeCommandExecution(MoneyTransferConfirmCommand command) {
-        var transferState = (MoneyTransferAggregateState) eventStoreService.retrieveAggregate(command.getAggregateId());
-        command.transferFromId = transferState.getTransferFrom();
-        command.transferToId = transferState.getTransferTo();
+        var transactionState = (TransactionAggregateState) eventStoreService.retrieveAggregate(command.getAggregateId());
+        var transaction = transactionState.getTransaction();
+        var transfer = transaction.getTransfer();
+        command.transferFromId = transfer.getWithdrawFrom();
+        command.transferToId = transfer.getDepositTo();
 
         ofNullable(command.transferFromId).ifPresent(UserId::tryLock);
         ofNullable(command.transferToId).ifPresent(UserId::tryLock);
@@ -45,43 +47,47 @@ public class MoneyTransferConfirmCommandProcessor extends CommandProcessorBase<M
 
     @Override
     protected List<EventBase<?>> buildEvents(MoneyTransferConfirmCommand command, AggregateStateBase<TransactionId> aggregateState) {
-        var moneyTransferState = (MoneyTransferAggregateState) aggregateState;
+        var transactionState = (TransactionAggregateState) aggregateState;
+        var transaction = transactionState.getTransaction();
+        var transfer = transaction.getTransfer();
         List<EventBase<?>> events = new ArrayList<>(3);
-
-        try {
-            commandValidator.validate(command, moneyTransferState);
-        } catch (Exception ex) {
-            var failedEvent = new MoneyTransferFailedEvent(command.getAggregateId());
-            failedEvent.setErrorMessage(ex.getMessage());
-            events.add(failedEvent);
-
+        if (!verifyCommand(command, transactionState, events)) {
             return unmodifiableList(events);
         }
 
-        var userFromState = (UserAggregateState) eventStoreService.retrieveAggregate(moneyTransferState.getTransferFrom());
-        var userToState = (UserAggregateState) eventStoreService.retrieveAggregate(moneyTransferState.getTransferTo());
+        var userSenderState = (UserAggregateState) eventStoreService.retrieveAggregate(transfer.getWithdrawFrom());
+        var userReceiverState = (UserAggregateState) eventStoreService.retrieveAggregate(transfer.getDepositTo());
 
-        var userFrom = new MoneyWithdrawnEvent(moneyTransferState.getTransferFrom());
-        userFrom.setTransactionId(moneyTransferState.getAggregateId());
-        userFrom.setCurrency(moneyTransferState.getCurrency());
-        userFrom.setValue(moneyTransferState.getValue());
+        var withdrawFrom = new WithdrawnEvent(transfer.getWithdrawFrom());
+        withdrawFrom.setTransactionId(transactionState.getAggregateId());
+        withdrawFrom.setAmount(transactionState.getAmount());
+        events.add(userSenderState.setupAggregateVersion(withdrawFrom));
 
-        events.add(userFromState.setupAggregateVersion(userFrom));
-
-        var userTo = new MoneyToppedUpEvent(moneyTransferState.getTransferTo());
-        userTo.setTransactionId(moneyTransferState.getAggregateId());
-        userTo.setCurrency(moneyTransferState.getCurrency());
-        userTo.setValue(moneyTransferState.getValue());
-
-        events.add(userToState.setupAggregateVersion(userTo));
+        var depositTo = new DepositEvent(transfer.getDepositTo());
+        depositTo.setTransactionId(transactionState.getAggregateId());
+        depositTo.setAmount(transactionState.getAmount());
+        events.add(userReceiverState.setupAggregateVersion(depositTo));
 
         events.add(
-                moneyTransferState.setupAggregateVersion(
-                        new MoneyTransferCompletedEvent(command.getAggregateId())
+                transactionState.setupAggregateVersion(
+                        new TransactionCompletedEvent(command.getAggregateId())
                 )
         );
 
         return unmodifiableList(events);
+    }
+
+    private boolean verifyCommand(MoneyTransferConfirmCommand command, TransactionAggregateState transactionState, List<EventBase<?>> events) {
+        try {
+            commandValidator.validate(command, transactionState);
+        } catch (Exception ex) {
+            var failedEvent = new TransactionFailedEvent(command.getAggregateId());
+            failedEvent.setErrorMessage(ex.getMessage());
+            events.add(failedEvent);
+
+            return false;
+        }
+        return true;
     }
 
     /**
@@ -93,10 +99,10 @@ public class MoneyTransferConfirmCommandProcessor extends CommandProcessorBase<M
         if (Objects.isNull(aggregateState)) {
             throw new CommandValidationException("Money transfer request is not found by id [ " + command.getAggregateId() + " ]");
         }
-        MoneyTransferAggregateState transferState = (MoneyTransferAggregateState) aggregateState;
-
-        if (transferState.getTransferStatus() != TransferStatus.PROCESSING) {
-            throw new CommandValidationException("Money transfer request by id [ " + command.getAggregateId() + " ] has incorrect status [ " + transferState.getTransferStatus() + " ]");
+        var transactionState = (TransactionAggregateState) aggregateState;
+        var transaction = transactionState.getTransaction();
+        if (transaction.getStatus() != TransactionStatus.PROCESSING) {
+            throw new CommandValidationException("Money transfer request by id [ " + command.getAggregateId() + " ] has incorrect status [ " + transaction.getStatus() + " ]");
         }
     }
 

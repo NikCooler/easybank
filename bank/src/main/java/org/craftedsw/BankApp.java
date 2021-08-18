@@ -36,7 +36,7 @@ public final class BankApp {
         app = Javalin.create();
         var appCnf = AppConfiguration.getInstance();
         var dslContext = DBConfig.getInstance().initDBContext();
-        var producer = initEventSavedIdEventBus(dslContext);
+        var producer = initEventBus(dslContext);
         var eventStoreService = new EventStoreServiceImpl(new EventStoreRepositoryImpl(), dslContext, producer);
         initControllers(eventStoreService, dslContext);
 
@@ -50,16 +50,21 @@ public final class BankApp {
         ).forEach(ControllerConfiguration::init);
     }
 
-    private static EventSavedIdProducer initEventSavedIdEventBus(DSLContext readModelContext) {
+    private static EventSavedIdProducer initEventBus(DSLContext readModelContext) {
         var savedEventIds = new LinkedBlockingQueue<Long>();
 
         var producer = new EventSavedIdProducer(savedEventIds);
         var dispatcher = new EventSavedIdDispatcher(savedEventIds);
-
-        dispatcher.registerSubscriber(new ReadModelUpdater(readModelContext));
-        new Thread(dispatcher).start();
+        runDispatcher(dispatcher, readModelContext);
 
         return producer;
+    }
+
+    private static void runDispatcher(EventSavedIdDispatcher dispatcher, DSLContext readModelContext) {
+        dispatcher.registerSubscriber(new ReadModelUpdater(readModelContext));
+        var dispatcherThread = new Thread(dispatcher);
+        dispatcherThread.setDaemon(true);
+        dispatcherThread.start();
     }
 
     public static BankApp getInstance() {

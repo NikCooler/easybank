@@ -2,7 +2,6 @@ package org.craftedsw.aggregate;
 
 import org.craftedsw.event.EventBase;
 
-import java.lang.reflect.Method;
 import java.util.List;
 
 import static org.craftedsw.util.SneakyThrow.doWithRuntimeException;
@@ -31,25 +30,29 @@ public abstract class AggregateStateBase<ID extends AggregateIdBase<ID>> {
     }
 
     public void applyEvents(List<EventBase<ID>> events) {
-        final AggregateStateBase state = this;
-        final Class<?> stateClass = this.getClass();
+        var state = this;
 
         events.stream()
-                .filter(event -> {
-                    try {
-                        stateClass.getMethod("apply", event.getClass());
-                    } catch (NoSuchMethodException e) {
-                        return false;
-                    }
-                    return true;
-                })
-                .forEach(event ->
-                    doWithRuntimeException(() -> {
-                        version++;
-                        Method methodApply = stateClass.getMethod("apply", event.getClass());
-                        methodApply.invoke(state, event);
-                    })
-                );
+                .filter(event -> isApplyMethodExist(event, state))
+                .forEach(event -> invokeApplyMethod(event, state));
     }
 
+    private boolean isApplyMethodExist(EventBase<ID> event, AggregateStateBase<ID> state) {
+        try {
+            var stateClass = state.getClass();
+            stateClass.getMethod("apply", event.getClass());
+        } catch (NoSuchMethodException e) {
+            return false;
+        }
+        return true;
+    }
+
+    private void invokeApplyMethod(EventBase<ID> event, AggregateStateBase<ID> state) {
+        doWithRuntimeException(() -> {
+            var stateClass = state.getClass();
+            var methodApply = stateClass.getMethod("apply", event.getClass());
+            methodApply.invoke(state, event);
+            version++;
+        });
+    }
 }

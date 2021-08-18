@@ -5,6 +5,7 @@ import org.craftedsw.aggregate.UserId;
 import org.craftedsw.cqrs.command.CommandProcessorBase;
 import org.craftedsw.event.EventBase;
 import org.craftedsw.event.MoneyAccountCreatedEvent;
+import org.craftedsw.type.Amount;
 import org.craftedsw.type.MoneyAccount;
 import org.craftedsw.writelane.EventStoreService;
 
@@ -22,7 +23,10 @@ public class MoneyAccountCreateCommandProcessor extends CommandProcessorBase<Mon
     @Override
     protected List<EventBase<?>> buildEvents(MoneyAccountCreateCommand command, AggregateStateBase<UserId> aggregateState) {
         var event = new MoneyAccountCreatedEvent(command.getAggregateId());
-        event.setMoneyAccount(MoneyAccount.of(command.getCurrency(), command.getValue()));
+        var amount = Amount.of(command.getCurrency(), command.getValue());
+        var account = MoneyAccount.of(amount);
+        event.setMoneyAccount(account);
+
         return List.of(aggregateState.setupAggregateVersion(event));
     }
 }

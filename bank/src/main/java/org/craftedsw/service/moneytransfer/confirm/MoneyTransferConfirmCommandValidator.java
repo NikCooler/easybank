@@ -1,17 +1,17 @@
 package org.craftedsw.service.moneytransfer.confirm;
 
 import org.craftedsw.aggregate.AggregateStateBase;
-import org.craftedsw.aggregate.MoneyTransferAggregateState;
+import org.craftedsw.aggregate.TransactionAggregateState;
 import org.craftedsw.aggregate.UserAggregateState;
 import org.craftedsw.cqrs.command.CommandValidationException;
 import org.craftedsw.cqrs.command.CommandValidator;
-import org.craftedsw.type.Currency;
-import org.craftedsw.type.TransferStatus;
+import org.craftedsw.service.moneytransfer.MoneyTransferValidator;
+import org.craftedsw.type.TransactionStatus;
 import org.craftedsw.writelane.EventStoreService;
 
-import java.math.BigDecimal;
-import java.util.Map;
 import java.util.Objects;
+
+import static java.lang.String.format;
 
 /**
  * @author Nikolay Smirnov
@@ -19,41 +19,31 @@ import java.util.Objects;
 public class MoneyTransferConfirmCommandValidator implements CommandValidator<MoneyTransferConfirmCommand> {
 
     private final EventStoreService eventStoreService;
+    private final MoneyTransferValidator transferValidator;
 
-    public MoneyTransferConfirmCommandValidator(EventStoreService eventStoreService) {
+    public MoneyTransferConfirmCommandValidator(EventStoreService eventStoreService, MoneyTransferValidator transferValidator) {
         this.eventStoreService = eventStoreService;
+        this.transferValidator = transferValidator;
     }
 
     @Override
     public boolean validate(MoneyTransferConfirmCommand command, AggregateStateBase aggregateState) {
-        String prefixErrorMessage = "Money transfer confirmation [ " + command.getAggregateId() + " ]";
-
         if (Objects.isNull(aggregateState)) {
-            throw new CommandValidationException("Money transfer request is not found by id [ " + command.getAggregateId() + " ]");
+            throw new CommandValidationException(format("Money transfer request is not found by id [ %s ]", command.getAggregateId()));
         }
-        var transferState = (MoneyTransferAggregateState) aggregateState;
+        var transactionState = (TransactionAggregateState) aggregateState;
+        var transaction = transactionState.getTransaction();
+        var transfer = transaction.getTransfer();
+        var transferAmount = transactionState.getAmount();
+        if (transaction.getStatus() != TransactionStatus.PROCESSING) {
+            throw new CommandValidationException(format("Money transfer request by id [ %s ] has incorrect status [ %s ]",
+                    command.getAggregateId(), transaction.getStatus()));
+        }
 
-        if (transferState.getTransferStatus() != TransferStatus.PROCESSING) {
-            throw new CommandValidationException("Money transfer request by id [ " + command.getAggregateId() + " ] has incorrect status [ " + transferState.getTransferStatus() + " ]");
-        }
+        var userSenderState = (UserAggregateState) eventStoreService.retrieveAggregate(transfer.getWithdrawFrom());
+        var userReceiverState = (UserAggregateState) eventStoreService.retrieveAggregate(transfer.getDepositTo());
+        transferValidator.validateTransfer(command.getAggregateId(), userSenderState, userReceiverState, transferAmount);
 
-        var userFromState = (UserAggregateState) eventStoreService.retrieveAggregate(transferState.getTransferFrom());
-        var userToState   = (UserAggregateState) eventStoreService.retrieveAggregate(transferState.getTransferTo());
-
-        Map<Currency, BigDecimal> userFromAccounts = userFromState.getMoneyAccounts();
-        if (!userFromAccounts.containsKey(transferState.getCurrency())) {
-            throw new CommandValidationException(prefixErrorMessage + " failed due to 'user from' [ " + userFromState.getAggregateId() + " ] " +
-                    "doesn't have money account [ '" + transferState.getCurrency() + "' ]");
-        }
-        BigDecimal userFromMoney = userFromAccounts.get(transferState.getCurrency());
-        if (userFromMoney.compareTo(transferState.getValue()) < 0) {
-            throw new CommandValidationException(prefixErrorMessage + " failed due to 'user from' [ " + userFromState.getAggregateId() + " ] " +
-                    "doesn't have enough money [ '" + transferState.getCurrency() + "' ]");
-        }
-        if (!userToState.getMoneyAccounts().containsKey(transferState.getCurrency())) {
-            throw new CommandValidationException(prefixErrorMessage + " failed due to 'user to' [ " + userToState.getAggregateId() + " ] " +
-                    "doesn't have money account [ '" + transferState.getCurrency() + "' ]");
-        }
         return true;
     }
 }

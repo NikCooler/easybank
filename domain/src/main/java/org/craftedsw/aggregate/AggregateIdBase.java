@@ -33,7 +33,8 @@ public abstract class AggregateIdBase<ID extends AggregateIdBase<ID>> implements
 
     @SuppressWarnings("unchecked")
     public ID tryLock() {
-        lock = AggregateLockingCache.getInstance().getLock(this);
+        var lockingCache = AggregateLockingCache.getInstance();
+        lock = lockingCache.getLock(this);
         try {
             if (lock.tryLock()) {
                 return (ID) this;

@@ -3,6 +3,7 @@ package org.craftedsw.config;
 import io.javalin.Javalin;
 import org.craftedsw.aggregate.TransactionId;
 import org.craftedsw.controller.MoneyTransferController;
+import org.craftedsw.service.moneytransfer.MoneyTransferValidator;
 import org.craftedsw.service.moneytransfer.confirm.MoneyTransferConfirmCommand;
 import org.craftedsw.service.moneytransfer.confirm.MoneyTransferConfirmCommandProcessor;
 import org.craftedsw.service.moneytransfer.confirm.MoneyTransferConfirmCommandValidator;
@@ -24,9 +25,12 @@ public final class MoneyTransferControllerConfiguration extends ControllerConfig
     }
 
     public void init() {
+        var commonTransferValidator = new MoneyTransferValidator();
+        var requestValidator = new MoneyTransferRequestCommandValidator(eventStoreService, commonTransferValidator);
+        var confirmValidator = new MoneyTransferConfirmCommandValidator(eventStoreService, commonTransferValidator);
         var moneyTransferController = new MoneyTransferController(
-                new MoneyTransferRequestCommandProcessor(eventStoreService, new MoneyTransferRequestCommandValidator(eventStoreService)),
-                new MoneyTransferConfirmCommandProcessor(eventStoreService, new MoneyTransferConfirmCommandValidator(eventStoreService)),
+                new MoneyTransferRequestCommandProcessor(eventStoreService, requestValidator),
+                new MoneyTransferConfirmCommandProcessor(eventStoreService, confirmValidator),
                 new MoneyTransferDetailsQueryProcessor(dslContext, new MoneyTransferDetailsQueryValidator(dslContext))
         );
 

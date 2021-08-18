@@ -21,7 +21,7 @@ public class TransactionId extends AggregateIdBase<TransactionId> {
 
     @Override
     public AggregateStateBase<TransactionId> newInstanceState() {
-        return new MoneyTransferAggregateState(this);
+        return new TransactionAggregateState(this);
     }
 
     @JsonCreator

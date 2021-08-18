@@ -3,7 +3,7 @@ package org.craftedsw.dto;
 import org.craftedsw.aggregate.TransactionId;
 import org.craftedsw.aggregate.UserId;
 import org.craftedsw.type.Currency;
-import org.craftedsw.type.TransferStatus;
+import org.craftedsw.type.TransactionStatus;
 
 import java.math.BigDecimal;
 
@@ -16,7 +16,7 @@ public class MoneyTransferDetailsDto {
 
     private UserId transferFrom;
     private UserId transferTo;
-    private TransferStatus transferStatus;
+    private TransactionStatus transactionStatus;
     private Currency currency;
     private BigDecimal value;
 
@@ -40,12 +40,12 @@ public class MoneyTransferDetailsDto {
         this.transferTo = transferTo;
     }
 
-    public TransferStatus getTransferStatus() {
-        return transferStatus;
+    public TransactionStatus getTransferStatus() {
+        return transactionStatus;
     }
 
-    public void setTransferStatus(TransferStatus transferStatus) {
-        this.transferStatus = transferStatus;
+    public void setTransferStatus(TransactionStatus transactionStatus) {
+        this.transactionStatus = transactionStatus;
     }
 
     public Currency getCurrency() {

@@ -53,8 +53,8 @@
         </createTable>
     </changeSet>
 
-    <changeSet id="17-08-2021-create-money_transfer-table" author="nikolay.smirnov">
-        <createTable tableName="money_transfer">
+    <changeSet id="18-08-2021-create-transaction-table" author="nikolay.smirnov">
+        <createTable tableName="transaction">
             <column name="transaction_id" type="varchar(36)">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
@@ -67,6 +67,9 @@
             <column name="status" type="varchar(30)">
                 <constraints nullable="false"/>
             </column>
+            <column name="type" type="varchar(30)">
+                <constraints nullable="false"/>
+            </column>
             <column name="currency" type="varchar(3)">
                 <constraints nullable="false"/>
             </column>
@@ -74,6 +77,9 @@
                 <constraints nullable="false"/>
             </column>
             <column name="error_message" type="varchar(300)"/>
+            <column name="event_timestamp" type="bigint(20)">
+                <constraints nullable="false"/>
+            </column>
         </createTable>
     </changeSet>
 

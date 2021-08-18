@@ -5,6 +5,7 @@ import org.craftedsw.cqrs.query.QueryValidator;
 import org.jooq.DSLContext;
 import org.jooq.impl.DSL;
 
+import static java.lang.String.format;
 import static org.craftedsw.model.tables.User.USER;
 
 /**
@@ -25,7 +26,7 @@ public class UserProfileQueryValidator implements QueryValidator<UserProfileQuer
                         .from(USER)
                         .where(USER.USER_ID.eq(query.userId)));
         if (!userExists) {
-            throw new QueryValidationException("User doesn't exist by id [ " + query.userId + " ]");
+            throw new QueryValidationException(format("User doesn't exist by id [ %s ]", query.userId));
         }
         return true;
     }

@@ -41,8 +41,8 @@
                     <enumConverter>true</enumConverter>
                 </forcedType>
                 <forcedType>
-                    <includeExpression>money_transfer.status</includeExpression>
-                    <userType>org.craftedsw.type.TransferStatus</userType>
+                    <includeExpression>transaction.status</includeExpression>
+                    <userType>org.craftedsw.type.TransactionStatus</userType>
                     <enumConverter>true</enumConverter>
                 </forcedType>
             </forcedTypes>
