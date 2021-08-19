@@ -12,6 +12,8 @@ import java.math.BigDecimal;
 import java.util.Objects;
 import java.util.function.Predicate;
 
+import static java.lang.String.format;
+
 /**
  * @author Nikolay Smirnov
  */
@@ -29,7 +31,7 @@ public class MoneyTransferRequestCommandValidator implements CommandValidator<Mo
     public boolean validate(MoneyTransferRequestCommand command, AggregateStateBase aggregateState) {
 
         if (Objects.nonNull(aggregateState)) {
-            throw new CommandValidationException("Money transfer request already exists by id [ " + command.getAggregateId() + " ]");
+            throw new CommandValidationException(format("Money transfer request already exists by id [ %s ]", command.getAggregateId()));
         }
 
         validate(cmd -> Objects.isNull(cmd.getTransferFrom()), command, "Field 'transferFrom' must NOT be empty");
@@ -39,30 +41,34 @@ public class MoneyTransferRequestCommandValidator implements CommandValidator<Mo
 
         var userSenderState = (UserAggregateState) eventStoreService.retrieveAggregate(command.getTransferFrom());
         var userReceiverState = (UserAggregateState) eventStoreService.retrieveAggregate(command.getTransferTo());
+        validateUsers(userSenderState, userReceiverState, command);
 
+        var amount = Amount.of(command.getCurrency(), command.getValue());
+        transferValidator.validateTransfer(command.getAggregateId(), userSenderState, userReceiverState, amount);
+        return true;
+    }
+
+    private void validateUsers(UserAggregateState userSenderState, UserAggregateState userReceiverState, MoneyTransferRequestCommand command) {
         if (Objects.isNull(userSenderState)) {
-            throw new CommandValidationException("User 'from' is not found by id [ " + command.getTransferFrom() + " ]");
+            throw new CommandValidationException(format("User 'from' is not found by id [ %s ]", command.getTransferFrom()));
         }
 
         if (Objects.isNull(userReceiverState)) {
-            throw new CommandValidationException("User 'to' is not found by id [ " + command.getTransferTo() + " ]");
+            throw new CommandValidationException(format("User 'to' is not found by id [ %s ]", command.getTransferTo()));
         }
 
         if (userSenderState.getAggregateId().equals(userReceiverState.getAggregateId())) {
             throw new CommandValidationException("Users are the same!");
         }
 
-        if (command.getValue().compareTo(BigDecimal.ZERO) <= 0) {
+        var value = command.getValue();
+        if (value.compareTo(BigDecimal.ZERO) <= 0) {
             throw new CommandValidationException("Money amount must be greater than zero!");
         }
 
-        if (command.getValue().scale() > 2) {
+        if (value.scale() > 2) {
             throw new CommandValidationException("Money amount is in incorrect format. Must be '#.##'");
         }
-
-        var amount = Amount.of(command.getCurrency(), command.getValue());
-        transferValidator.validateTransfer(command.getAggregateId(), userSenderState, userReceiverState, amount);
-        return true;
     }
 
     private static void validate(Predicate<MoneyTransferRequestCommand> validateFunc, MoneyTransferRequestCommand command, String errorMessage) {

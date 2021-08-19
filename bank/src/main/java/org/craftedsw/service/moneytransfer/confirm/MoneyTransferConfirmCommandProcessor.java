@@ -4,6 +4,7 @@ import org.craftedsw.aggregate.*;
 import org.craftedsw.cqrs.command.CommandProcessorBase;
 import org.craftedsw.cqrs.command.CommandValidationException;
 import org.craftedsw.event.*;
+import org.craftedsw.type.Amount;
 import org.craftedsw.type.TransactionStatus;
 import org.craftedsw.writelane.EventStoreService;
 
@@ -55,18 +56,11 @@ public class MoneyTransferConfirmCommandProcessor extends CommandProcessorBase<M
             return unmodifiableList(events);
         }
 
-        var userSenderState = (UserAggregateState) eventStoreService.retrieveAggregate(transfer.getWithdrawFrom());
-        var userReceiverState = (UserAggregateState) eventStoreService.retrieveAggregate(transfer.getDepositTo());
+        var withdrawFrom = buildWithdrawEvent(transfer.getWithdrawFrom(), command.getAggregateId(), transactionState.getAmount());
+        events.add(withdrawFrom);
 
-        var withdrawFrom = new WithdrawnEvent(transfer.getWithdrawFrom());
-        withdrawFrom.setTransactionId(transactionState.getAggregateId());
-        withdrawFrom.setAmount(transactionState.getAmount());
-        events.add(userSenderState.setupAggregateVersion(withdrawFrom));
-
-        var depositTo = new DepositEvent(transfer.getDepositTo());
-        depositTo.setTransactionId(transactionState.getAggregateId());
-        depositTo.setAmount(transactionState.getAmount());
-        events.add(userReceiverState.setupAggregateVersion(depositTo));
+        var depositTo = buildDepositEvent(transfer.getDepositTo(), command.getAggregateId(), transactionState.getAmount());
+        events.add(depositTo);
 
         events.add(
                 transactionState.setupAggregateVersion(
@@ -75,6 +69,24 @@ public class MoneyTransferConfirmCommandProcessor extends CommandProcessorBase<M
         );
 
         return unmodifiableList(events);
+    }
+
+    private EventBase<UserId> buildWithdrawEvent(UserId userSenderId, TransactionId transactionId, Amount amount) {
+        var userSenderState = (UserAggregateState) eventStoreService.retrieveAggregate(userSenderId);
+        var withdrawFrom = new WithdrawnEvent(userSenderId);
+        withdrawFrom.setTransactionId(transactionId);
+        withdrawFrom.setAmount(amount);
+
+        return userSenderState.setupAggregateVersion(withdrawFrom);
+    }
+
+    private EventBase<UserId> buildDepositEvent(UserId userReceiverId, TransactionId transactionId, Amount amount) {
+        var userReceiverState = (UserAggregateState) eventStoreService.retrieveAggregate(userReceiverId);
+        var depositTo = new DepositEvent(userReceiverId);
+        depositTo.setTransactionId(transactionId);
+        depositTo.setAmount(amount);
+
+        return userReceiverState.setupAggregateVersion(depositTo);
     }
 
     private boolean verifyCommand(MoneyTransferConfirmCommand command, TransactionAggregateState transactionState, List<EventBase<?>> events) {

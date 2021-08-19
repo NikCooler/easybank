@@ -6,6 +6,12 @@ import org.craftedsw.controller.UserController;
 import org.craftedsw.service.user.moneyaccount.create.MoneyAccountCreateCommand;
 import org.craftedsw.service.user.moneyaccount.create.MoneyAccountCreateCommandProcessor;
 import org.craftedsw.service.user.moneyaccount.create.MoneyAccountCreateCommandValidator;
+import org.craftedsw.service.user.moneyaccount.deposit.DepositAccountCommand;
+import org.craftedsw.service.user.moneyaccount.deposit.DepositAccountCommandProcessor;
+import org.craftedsw.service.user.moneyaccount.deposit.DepositAccountCommandValidator;
+import org.craftedsw.service.user.moneyaccount.withdraw.WithdrawAccountCommand;
+import org.craftedsw.service.user.moneyaccount.withdraw.WithdrawAccountCommandProcessor;
+import org.craftedsw.service.user.moneyaccount.withdraw.WithdrawAccountCommandValidator;
 import org.craftedsw.service.user.profile.UserProfileQuery;
 import org.craftedsw.service.user.profile.UserProfileQueryProcessor;
 import org.craftedsw.service.user.profile.UserProfileQueryValidator;
@@ -27,7 +33,9 @@ public final class UserControllerConfiguration extends ControllerConfiguration {
         var userController = new UserController(
                 new UserRegisterCommandProcessor(eventStoreService, new UserRegisterCommandValidator()),
                 new UserProfileQueryProcessor(dslContext, new UserProfileQueryValidator(dslContext)),
-                new MoneyAccountCreateCommandProcessor(eventStoreService, new MoneyAccountCreateCommandValidator())
+                new MoneyAccountCreateCommandProcessor(eventStoreService, new MoneyAccountCreateCommandValidator()),
+                new DepositAccountCommandProcessor(eventStoreService, new DepositAccountCommandValidator()),
+                new WithdrawAccountCommandProcessor(eventStoreService, new WithdrawAccountCommandValidator())
         );
 
         initPostRequest(
@@ -40,6 +48,18 @@ public final class UserControllerConfiguration extends ControllerConfiguration {
                 PUT_USER_MONEY_ACCOUNT,
                 ctx -> new MoneyAccountCreateCommand(UserId.valueOf(ctx.pathParam("userId"))),
                 userController::createMoneyAccount
+        );
+
+        initPutRequest(
+                PUT_USER_DEPOSIT_ACCOUNT,
+                ctx -> new DepositAccountCommand(UserId.valueOf(ctx.pathParam("userId"))),
+                userController::depositAccount
+        );
+
+        initPutRequest(
+                PUT_USER_WITHDRAW_ACCOUNT,
+                ctx -> new WithdrawAccountCommand(UserId.valueOf(ctx.pathParam("userId"))),
+                userController::withdrawAccount
         );
 
         initGetRequest(GET_USER_PROFILE,
