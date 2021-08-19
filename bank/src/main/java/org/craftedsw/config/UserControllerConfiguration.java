@@ -9,6 +9,9 @@ import org.craftedsw.service.user.moneyaccount.create.MoneyAccountCreateCommandV
 import org.craftedsw.service.user.moneyaccount.deposit.DepositAccountCommand;
 import org.craftedsw.service.user.moneyaccount.deposit.DepositAccountCommandProcessor;
 import org.craftedsw.service.user.moneyaccount.deposit.DepositAccountCommandValidator;
+import org.craftedsw.service.user.moneyaccount.statement.UserAccountsStatementQuery;
+import org.craftedsw.service.user.moneyaccount.statement.UserAccountsStatementQueryProcessor;
+import org.craftedsw.service.user.moneyaccount.statement.UserAccountsStatementQueryValidator;
 import org.craftedsw.service.user.moneyaccount.withdraw.WithdrawAccountCommand;
 import org.craftedsw.service.user.moneyaccount.withdraw.WithdrawAccountCommandProcessor;
 import org.craftedsw.service.user.moneyaccount.withdraw.WithdrawAccountCommandValidator;
@@ -35,7 +38,8 @@ public final class UserControllerConfiguration extends ControllerConfiguration {
                 new UserProfileQueryProcessor(dslContext, new UserProfileQueryValidator(dslContext)),
                 new MoneyAccountCreateCommandProcessor(eventStoreService, new MoneyAccountCreateCommandValidator()),
                 new DepositAccountCommandProcessor(eventStoreService, new DepositAccountCommandValidator()),
-                new WithdrawAccountCommandProcessor(eventStoreService, new WithdrawAccountCommandValidator())
+                new WithdrawAccountCommandProcessor(eventStoreService, new WithdrawAccountCommandValidator()),
+                new UserAccountsStatementQueryProcessor(dslContext, new UserAccountsStatementQueryValidator(dslContext), eventStoreService)
         );
 
         initPostRequest(
@@ -65,6 +69,11 @@ public final class UserControllerConfiguration extends ControllerConfiguration {
         initGetRequest(GET_USER_PROFILE,
                 ctx -> new UserProfileQuery(UserId.valueOf(ctx.pathParam("userId"))),
                 userController::userProfile
+        );
+
+        initGetRequest(GET_USER_ACCOUNTS_STATEMENT,
+                ctx -> new UserAccountsStatementQuery(UserId.valueOf(ctx.pathParam("userId"))),
+                userController::userAccountsStatement
         );
     }
 

@@ -5,6 +5,15 @@ package org.craftedsw.type;
  */
 public enum Currency {
 
-    EUR
+    EUR("Euro");
 
+    final String title;
+
+    Currency(String title) {
+        this.title = title;
+    }
+
+    public String getTitle() {
+        return title;
+    }
 }

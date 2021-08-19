@@ -5,6 +5,8 @@ import org.craftedsw.service.user.moneyaccount.create.MoneyAccountCreateCommand;
 import org.craftedsw.service.user.moneyaccount.create.MoneyAccountCreateCommandProcessor;
 import org.craftedsw.service.user.moneyaccount.deposit.DepositAccountCommand;
 import org.craftedsw.service.user.moneyaccount.deposit.DepositAccountCommandProcessor;
+import org.craftedsw.service.user.moneyaccount.statement.UserAccountsStatementQuery;
+import org.craftedsw.service.user.moneyaccount.statement.UserAccountsStatementQueryProcessor;
 import org.craftedsw.service.user.moneyaccount.withdraw.WithdrawAccountCommand;
 import org.craftedsw.service.user.moneyaccount.withdraw.WithdrawAccountCommandProcessor;
 import org.craftedsw.service.user.profile.UserProfileQuery;
@@ -21,6 +23,7 @@ public class UserController {
     private final UserProfileQueryProcessor userProfileQueryProcessor;
     private final DepositAccountCommandProcessor depositAccountCommandProcessor;
     private final WithdrawAccountCommandProcessor withdrawAccountCommandProcessor;
+    private final UserAccountsStatementQueryProcessor userAccountsStatementQueryProcessor;
 
     private final MoneyAccountCreateCommandProcessor moneyAccountCreateCommandProcessor;
 
@@ -29,13 +32,15 @@ public class UserController {
             UserProfileQueryProcessor userProfileQueryProcessor,
             MoneyAccountCreateCommandProcessor moneyAccountCreateCommandProcessor,
             DepositAccountCommandProcessor depositAccountCommandProcessor,
-            WithdrawAccountCommandProcessor withdrawAccountCommandProcessor
+            WithdrawAccountCommandProcessor withdrawAccountCommandProcessor,
+            UserAccountsStatementQueryProcessor userAccountsStatementQueryProcessor
     ) {
         this.registerCommandProcessor = registerCommandProcessor;
         this.userProfileQueryProcessor = userProfileQueryProcessor;
         this.moneyAccountCreateCommandProcessor = moneyAccountCreateCommandProcessor;
         this.depositAccountCommandProcessor = depositAccountCommandProcessor;
         this.withdrawAccountCommandProcessor = withdrawAccountCommandProcessor;
+        this.userAccountsStatementQueryProcessor = userAccountsStatementQueryProcessor;
     }
 
     // POST
@@ -56,6 +61,11 @@ public class UserController {
     // PUT
     public Response withdrawAccount(WithdrawAccountCommand command) {
         return withdrawAccountCommandProcessor.executeCommand(command);
+    }
+
+    // GET
+    public Response userAccountsStatement(UserAccountsStatementQuery query) {
+        return userAccountsStatementQueryProcessor.executeQuery(query);
     }
 
     // GET

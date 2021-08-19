@@ -21,7 +21,7 @@ public class UserAggregateState extends AggregateStateBase<UserId> {
     private String email;
 
     private final Map<Currency, MoneyAccount> accounts = new HashMap<>();
-    private final List<Statement> statements = new ArrayList<>();
+    private final UserAccountsStatement userAccountsStatement = new UserAccountsStatement();
 
     UserAggregateState(UserId aggregateId) {
         super(aggregateId);
@@ -41,7 +41,7 @@ public class UserAggregateState extends AggregateStateBase<UserId> {
         var account = accounts.get(withdrawAmount.getCurrency());
         var total = account.withdraw(withdrawAmount);
 
-        statements.add(buildStatement(event.getAmount(), total, StatementType.DEBIT, event.getEventTimestamp()));
+        userAccountsStatement.addTransactionStatement(buildTransactionStatement(event.getAmount(), total, StatementType.DEBIT, event.getEventTimestamp()));
     }
 
     public void apply(DepositEvent event) {
@@ -49,23 +49,8 @@ public class UserAggregateState extends AggregateStateBase<UserId> {
         var account = accounts.get(depositAmount.getCurrency());
         var total = account.deposit(depositAmount);
 
-        statements.add(buildStatement(event.getAmount(), total, StatementType.CREDIT, event.getEventTimestamp()));
+        userAccountsStatement.addTransactionStatement(buildTransactionStatement(event.getAmount(), total, StatementType.CREDIT, event.getEventTimestamp()));
     }
-
-    private Statement buildStatement(Amount change, Amount total, StatementType type, Long timestamp) {
-        var act = new StatementAct(change, total);
-        var date = LocalDateTime.ofInstant(
-                Instant.ofEpochMilli(timestamp),
-                TimeZone.getDefault().toZoneId()
-        );
-
-        return new Statement(type, act, date);
-    }
-
-    //
-    // Getters and setters
-    //
-
 
     public String getEmail() {
         return email;
@@ -73,5 +58,19 @@ public class UserAggregateState extends AggregateStateBase<UserId> {
 
     public Map<Currency, MoneyAccount> getAccounts() {
         return unmodifiableMap(accounts);
+    }
+
+    public List<String> getUserAccountsStatementInfo() {
+        return userAccountsStatement.buildStatements();
+    }
+
+    private TransactionStatement buildTransactionStatement(Amount change, Amount total, StatementType type, Long timestamp) {
+        var act = new StatementAct(change, total);
+        var date = LocalDateTime.ofInstant(
+                Instant.ofEpochMilli(timestamp),
+                TimeZone.getDefault().toZoneId()
+        );
+
+        return new TransactionStatement(type, act, date);
     }
 }

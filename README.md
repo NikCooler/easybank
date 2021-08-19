@@ -87,6 +87,30 @@ PUT    /user/:userId/account/withdraw
 	"value": 15.05
 }
 ```
+- Get a statement for all user accounts
+```
+GET    /user/:userId/accounts/statement
+
+RESPONSE will be similar to this:
+
+{
+    "status": 200,
+    "message": "OK",
+    "payload": {
+        "statements": [
+            "|                 date |       credit |        debit |      balance |",
+            "|  19-08-2021 02:21:06 |    20.10 EUR |              |    94.85 EUR |",
+            "|  19-08-2021 02:21:09 |              |     5.25 EUR |    94.85 EUR |",
+            "|  19-08-2021 02:21:13 |    20.10 EUR |              |    94.85 EUR |",
+            "|  19-08-2021 02:21:13 |    20.10 EUR |              |    94.85 EUR |",
+            "|  19-08-2021 02:21:14 |    20.10 EUR |              |    94.85 EUR |",
+            "|  19-08-2021 02:21:16 |              |     5.25 EUR |    94.85 EUR |",
+            "|  19-08-2021 02:21:16 |              |     5.25 EUR |    94.85 EUR |",
+            "|  19-08-2021 02:21:19 |    20.10 EUR |              |    94.85 EUR |"
+        ]
+    }
+}
+```
 - Request money transfer from one account to another ( Confirmation is required. See the endpoint below )
 ```
 POST    /transfer/:transactionId/request

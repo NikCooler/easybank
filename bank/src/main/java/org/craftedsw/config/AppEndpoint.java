@@ -12,6 +12,7 @@ public final class AppEndpoint {
     public static final String PUT_USER_MONEY_ACCOUNT = "/user/:userId/account/create";
     public static final String PUT_USER_DEPOSIT_ACCOUNT = "/user/:userId/account/deposit";
     public static final String PUT_USER_WITHDRAW_ACCOUNT = "/user/:userId/account/withdraw";
+    public static final String GET_USER_ACCOUNTS_STATEMENT = "/user/:userId/accounts/statement";
 
     public static final String POST_MONEY_TRANSFER_REQUEST = "/transfer/:transactionId/request";
     public static final String PUT_MONEY_TRANSFER_CONFIRM = "/transfer/:transactionId/confirm";
