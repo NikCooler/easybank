@@ -4,11 +4,12 @@ import org.craftedsw.event.MoneyAccountCreatedEvent;
 import org.craftedsw.event.DepositEvent;
 import org.craftedsw.event.WithdrawnEvent;
 import org.craftedsw.event.UserRegisteredEvent;
+import org.craftedsw.type.*;
 import org.craftedsw.type.Currency;
-import org.craftedsw.type.MoneyAccount;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.util.*;
 
 import static java.util.Collections.unmodifiableMap;
 
@@ -20,6 +21,7 @@ public class UserAggregateState extends AggregateStateBase<UserId> {
     private String email;
 
     private final Map<Currency, MoneyAccount> accounts = new HashMap<>();
+    private final List<Statement> statements = new ArrayList<>();
 
     UserAggregateState(UserId aggregateId) {
         super(aggregateId);
@@ -37,13 +39,27 @@ public class UserAggregateState extends AggregateStateBase<UserId> {
     public void apply(WithdrawnEvent event) {
         var withdrawAmount = event.getAmount();
         var account = accounts.get(withdrawAmount.getCurrency());
-        account.withdraw(withdrawAmount);
+        var total = account.withdraw(withdrawAmount);
+
+        statements.add(buildStatement(event.getAmount(), total, StatementType.DEBIT, event.getEventTimestamp()));
     }
 
     public void apply(DepositEvent event) {
         var depositAmount = event.getAmount();
         var account = accounts.get(depositAmount.getCurrency());
-        account.deposit(depositAmount);
+        var total = account.deposit(depositAmount);
+
+        statements.add(buildStatement(event.getAmount(), total, StatementType.CREDIT, event.getEventTimestamp()));
+    }
+
+    private Statement buildStatement(Amount change, Amount total, StatementType type, Long timestamp) {
+        var act = new StatementAct(change, total);
+        var date = LocalDateTime.ofInstant(
+                Instant.ofEpochMilli(timestamp),
+                TimeZone.getDefault().toZoneId()
+        );
+
+        return new Statement(type, act, date);
     }
 
     //

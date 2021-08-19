@@ -42,12 +42,14 @@ public final class MoneyAccount {
         return currentValue.compareTo(amount.getValue());
     }
 
-    public void withdraw(Amount withdrawAmount) {
+    public Amount withdraw(Amount withdrawAmount) {
         amount.withdraw(withdrawAmount);
+        return amount;
     }
 
-    public void deposit(Amount depositAmount) {
+    public Amount deposit(Amount depositAmount) {
         amount.deposit(depositAmount);
+        return amount;
     }
 
     @Override
