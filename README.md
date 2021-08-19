@@ -87,9 +87,9 @@ PUT    /user/:userId/account/withdraw
 	"value": 15.05
 }
 ```
-- Get a statement for all user accounts
+- Get a statement for all user accounts. It is possible to filter by 'statementType [DEBIT, CREDIT]' or/and by date range [dateFrom,dateTo] in epoch millis
 ```
-GET    /user/:userId/accounts/statement
+GET    /user/:userId/accounts/statement?statementTypes=DEBIT&statementTypes=CREDIT
 
 RESPONSE will be similar to this:
 

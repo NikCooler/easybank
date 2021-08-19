@@ -1,5 +1,8 @@
 package org.craftedsw.type;
 
+import java.util.Arrays;
+import java.util.Objects;
+
 /**
  * @author Nikolay Smirnov
  */
@@ -16,5 +19,10 @@ public enum StatementType {
 
     public String getTitle() {
         return title;
+    }
+
+    public static boolean exists(String type) {
+        return Arrays.stream(StatementType.values())
+                .anyMatch(st -> Objects.equals(st.name(), type));
     }
 }

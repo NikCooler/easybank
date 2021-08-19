@@ -27,6 +27,10 @@ public class Amount {
         return new Amount(currency, value);
     }
 
+    public static Amount copyOf(Amount other) {
+        return Amount.of(other.getCurrency(), other.getValue());
+    }
+
     public Currency getCurrency() {
         return currency;
     }

@@ -72,7 +72,12 @@ public final class UserControllerConfiguration extends ControllerConfiguration {
         );
 
         initGetRequest(GET_USER_ACCOUNTS_STATEMENT,
-                ctx -> new UserAccountsStatementQuery(UserId.valueOf(ctx.pathParam("userId"))),
+                ctx -> new UserAccountsStatementQuery(
+                            UserId.valueOf(ctx.pathParam("userId")),
+                            ctx.queryParams("statementTypes"),
+                            ctx.queryParam("dateFrom"),
+                            ctx.queryParam("dateTo")
+                ),
                 userController::userAccountsStatement
         );
     }

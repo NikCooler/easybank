@@ -2,6 +2,7 @@ package org.craftedsw.type;
 
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 import static java.lang.String.format;
@@ -24,15 +25,18 @@ public class UserAccountsStatement {
         transactionStatements.add(transactionStatement);
     }
 
-    public List<String> buildStatements() {
+    public List<String> filterAndCollectStatementRows(StatementFilter filter) {
         var statements = new ArrayList<String>();
         statements.add(HEADER);
 
-        transactionStatements.forEach(ts -> {
-            var act = ts.getAct();
-            var debit = ts.getType() == DEBIT ? act.getChange() : null;
-            var credit = ts.getType() == CREDIT ? act.getChange() : null;
-            var st = format(PRINT_FORMULA,
+        transactionStatements.stream()
+                .filter(st -> filterStatement(st, filter))
+                .sorted(Comparator.comparing(TransactionStatement::getDate).reversed())
+                .forEach(ts -> {
+                    var act = ts.getAct();
+                    var debit = ts.getType() == DEBIT ? act.getChange() : null;
+                    var credit = ts.getType() == CREDIT ? act.getChange() : null;
+                    var st = format(PRINT_FORMULA,
                     DATE_FORMATTER.format(ts.getDate()),
                     formatAmount(credit),
                     formatAmount(debit),
@@ -42,6 +46,16 @@ public class UserAccountsStatement {
         });
 
         return statements;
+    }
+
+    private boolean filterStatement(TransactionStatement ts, StatementFilter filter) {
+        if (!filter.isTypePresent(ts.getType())) {
+            return false;
+        }
+        if (!filter.isDateAllowed(ts.getDate())) {
+            return false;
+        }
+        return true;
     }
 
     private String formatAmount(Amount amount) {

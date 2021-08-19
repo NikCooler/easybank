@@ -3,6 +3,7 @@ package org.craftedsw.service.user.moneyaccount.statement;
 import org.craftedsw.aggregate.UserAggregateState;
 import org.craftedsw.cqrs.query.QueryProcessorBase;
 import org.craftedsw.dto.UserAccountsStatementDto;
+import org.craftedsw.type.StatementFilter;
 import org.craftedsw.writelane.EventStoreService;
 import org.jooq.DSLContext;
 
@@ -25,7 +26,12 @@ public class UserAccountsStatementQueryProcessor extends QueryProcessorBase<User
     @Override
     protected UserAccountsStatementDto buildPayload(UserAccountsStatementQuery query) {
         var userState = (UserAggregateState) eventStoreService.retrieveAggregate(query.userId);
+        var accountsStatement = userState.getUserAccountsStatement();
 
-        return new UserAccountsStatementDto(userState.getUserAccountsStatementInfo());
+        var filter = new StatementFilter(query.getDateFrom(), query.getDateTo());
+        filter.addAllTypes(query.getStatementTypes());
+        var statementRows = accountsStatement.filterAndCollectStatementRows(filter);
+
+        return new UserAccountsStatementDto(statementRows);
     }
 }
