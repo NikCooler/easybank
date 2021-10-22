@@ -37,6 +37,7 @@
         <assertj.core.version>3.11.1</assertj.core.version>
         <mockito.version>3.2.4</mockito.version>
         <junit.version>4.12</junit.version>
+        <awaitability.version>4.0.3</awaitability.version>
     </properties>
 
     <dependencyManagement>
@@ -120,6 +121,12 @@
                 <groupId>org.easybank</groupId>
                 <artifactId>write-lane</artifactId>
                 <version>${write.lane.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.awaitility</groupId>
+                <artifactId>awaitility</artifactId>
+                <version>${awaitability.version}</version>
+                <scope>test</scope>
             </dependency>
         </dependencies>
     </dependencyManagement>

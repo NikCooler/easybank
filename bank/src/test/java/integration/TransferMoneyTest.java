@@ -9,7 +9,9 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.math.BigDecimal;
+import java.util.concurrent.TimeUnit;
 
+import static org.awaitility.Awaitility.waitAtMost;
 import static org.easybank.type.Currency.EUR;
 import static org.easybank.util.SneakyThrow.doWithRuntimeException;
 import static integration.helper.MoneyTransferTestHelper.confirmTransferRequest;
@@ -64,13 +66,14 @@ public class TransferMoneyTest {
         HttpResponse transferConfirmed = confirmTransferRequest(transactionId);
         assertThat(transferConfirmed.getBody()).isEqualTo("{\"status\":200,\"message\":\"OK\",\"payload\":null}");
 
-        doWithRuntimeException(() -> Thread.sleep(100));
+        waitAtMost(1, TimeUnit.SECONDS)
+                .untilAsserted(() -> {
+                    assertThat(getUserProfile(transferFromId).getBody())
+                            .isEqualTo(readFromJsonFile("testMoneyTransferCompletedSenderProfile.json", this.getClass()));
 
-        assertThat(getUserProfile(transferFromId).getBody())
-                .isEqualTo(readFromJsonFile("testMoneyTransferCompletedSenderProfile.json", this.getClass()));
-
-        assertThat(getUserProfile(transferToId).getBody())
-                .isEqualTo(readFromJsonFile("testMoneyTransferCompletedRecipientProfile.json", this.getClass()));
+                    assertThat(getUserProfile(transferToId).getBody())
+                            .isEqualTo(readFromJsonFile("testMoneyTransferCompletedRecipientProfile.json", this.getClass()));
+                });
     }
 
     private UserId createEuroUserAccount(String userIdAsString, String email, Double moneyAmount) {
