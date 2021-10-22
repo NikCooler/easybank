@@ -1,7 +1,7 @@
 package integration.helper;
 
-import org.craftedsw.aggregate.TransactionId;
-import org.craftedsw.service.moneytransfer.request.MoneyTransferRequestCommand;
+import org.easybank.aggregate.TransactionId;
+import org.easybank.service.moneytransfer.request.MoneyTransferRequestCommand;
 import io.javalin.plugin.json.JavalinJson;
 import kong.unirest.HttpResponse;
 import kong.unirest.Unirest;

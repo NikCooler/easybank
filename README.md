@@ -1,4 +1,4 @@
-# Bank kata factory14
+# Easy bank
 
 ## 1 Description
 This app is used for:

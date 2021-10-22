@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.InputStream;
 
-import static org.craftedsw.util.SneakyThrow.doWithRuntimeException;
+import static org.easybank.util.SneakyThrow.doWithRuntimeException;
 
 /**
  * @author Nikolay Smirnov

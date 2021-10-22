@@ -1,9 +1,9 @@
 package integration;
 
-import org.craftedsw.BankApp;
+import org.easybank.BankApp;
 import kong.unirest.HttpResponse;
-import org.craftedsw.aggregate.UserId;
-import org.craftedsw.type.Currency;
+import org.easybank.aggregate.UserId;
+import org.easybank.type.Currency;
 import org.junit.Before;
 import org.junit.Test;
 

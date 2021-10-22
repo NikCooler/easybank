@@ -2,8 +2,8 @@ package integration.helper;
 
 import kong.unirest.HttpResponse;
 import kong.unirest.Unirest;
-import org.craftedsw.aggregate.UserId;
-import org.craftedsw.type.Currency;
+import org.easybank.aggregate.UserId;
+import org.easybank.type.Currency;
 
 /**
  * @author Nikolay Smirnov

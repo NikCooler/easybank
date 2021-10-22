@@ -27,27 +27,27 @@
             <forcedTypes>
                 <forcedType>
                     <expression>user_id|transferred_from|transferred_to</expression>
-                    <userType>org.craftedsw.aggregate.UserId</userType>
-                    <converter>org.craftedsw.aggregate.UserId.JooqUserIdConverter</converter>
+                    <userType>org.easybank.aggregate.UserId</userType>
+                    <converter>org.easybank.aggregate.UserId.JooqUserIdConverter</converter>
                 </forcedType>
                 <forcedType>
                     <includeExpression>transaction_id</includeExpression>
-                    <userType>org.craftedsw.aggregate.TransactionId</userType>
-                    <converter>org.craftedsw.aggregate.TransactionId.JooqTransactionIdConverter</converter>
+                    <userType>org.easybank.aggregate.TransactionId</userType>
+                    <converter>org.easybank.aggregate.TransactionId.JooqTransactionIdConverter</converter>
                 </forcedType>
                 <forcedType>
                     <includeExpression>currency</includeExpression>
-                    <userType>org.craftedsw.type.Currency</userType>
+                    <userType>org.easybank.type.Currency</userType>
                     <enumConverter>true</enumConverter>
                 </forcedType>
                 <forcedType>
                     <includeExpression>transaction.status</includeExpression>
-                    <userType>org.craftedsw.type.TransactionStatus</userType>
+                    <userType>org.easybank.type.TransactionStatus</userType>
                     <enumConverter>true</enumConverter>
                 </forcedType>
                 <forcedType>
                     <includeExpression>transaction.type</includeExpression>
-                    <userType>org.craftedsw.type.TransactionType</userType>
+                    <userType>org.easybank.type.TransactionType</userType>
                     <enumConverter>true</enumConverter>
                 </forcedType>
             </forcedTypes>
@@ -62,7 +62,7 @@
         </generate>
 
         <target>
-            <packageName>org.craftedsw.model</packageName>
+            <packageName>org.easybank.model</packageName>
             <directory>../domain/src/main/java</directory>
         </target>
     </generator>

@@ -1,17 +1,17 @@
 package integration;
 
-import org.craftedsw.BankApp;
-import org.craftedsw.aggregate.TransactionId;
-import org.craftedsw.aggregate.UserId;
-import org.craftedsw.service.moneytransfer.request.MoneyTransferRequestCommand;
+import org.easybank.BankApp;
+import org.easybank.aggregate.TransactionId;
+import org.easybank.aggregate.UserId;
+import org.easybank.service.moneytransfer.request.MoneyTransferRequestCommand;
 import kong.unirest.HttpResponse;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.math.BigDecimal;
 
-import static org.craftedsw.type.Currency.EUR;
-import static org.craftedsw.util.SneakyThrow.doWithRuntimeException;
+import static org.easybank.type.Currency.EUR;
+import static org.easybank.util.SneakyThrow.doWithRuntimeException;
 import static integration.helper.MoneyTransferTestHelper.confirmTransferRequest;
 import static integration.helper.MoneyTransferTestHelper.createTransferRequest;
 import static integration.helper.MoneyTransferTestHelper.getMoneyTransferDetails;
