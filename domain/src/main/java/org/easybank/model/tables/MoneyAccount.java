@@ -28,7 +28,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class MoneyAccount extends TableImpl<MoneyAccountRecord> {
 
-    private static final long serialVersionUID = -770372697;
+    private static final long serialVersionUID = -948943677;
 
     /**
      * The reference instance of <code>MONEY_ACCOUNT</code>

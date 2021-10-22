@@ -25,7 +25,7 @@ import org.jooq.impl.UpdatableRecordImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class TransactionRecord extends UpdatableRecordImpl<TransactionRecord> implements Record9<TransactionId, UserId, UserId, TransactionStatus, TransactionType, Currency, BigDecimal, String, Long> {
 
-    private static final long serialVersionUID = -2055865321;
+    private static final long serialVersionUID = 1631515904;
 
     /**
      * Setter for <code>TRANSACTION.TRANSACTION_ID</code>.

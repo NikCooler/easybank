@@ -5,8 +5,8 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>org.craftedsw</groupId>
-        <artifactId>bankkata_jbehave</artifactId>
+        <groupId>org.easybank</groupId>
+        <artifactId>easybank</artifactId>
         <relativePath>../pom.xml</relativePath>
         <version>1.0</version>
     </parent>
@@ -48,11 +48,11 @@
             <artifactId>jooq-meta-extensions</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.craftedsw</groupId>
+            <groupId>org.easybank</groupId>
             <artifactId>write-lane</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.craftedsw</groupId>
+            <groupId>org.easybank</groupId>
             <artifactId>cqrs</artifactId>
         </dependency>
         <dependency>

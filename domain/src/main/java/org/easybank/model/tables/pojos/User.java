@@ -15,7 +15,7 @@ import org.easybank.aggregate.UserId;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class User implements Serializable {
 
-    private static final long serialVersionUID = 714776288;
+    private static final long serialVersionUID = -540475540;
 
     private UserId userId;
     private String email;

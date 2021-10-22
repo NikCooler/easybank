@@ -18,7 +18,7 @@ import org.jooq.impl.UpdatableRecordImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class EventStoreRecord extends UpdatableRecordImpl<EventStoreRecord> implements Record6<Long, String, Integer, String, String, Long> {
 
-    private static final long serialVersionUID = -81103888;
+    private static final long serialVersionUID = 963092512;
 
     /**
      * Setter for <code>EVENT_STORE.EVENT_ID</code>.

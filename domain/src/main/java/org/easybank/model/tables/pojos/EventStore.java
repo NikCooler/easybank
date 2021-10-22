@@ -13,7 +13,7 @@ import java.io.Serializable;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class EventStore implements Serializable {
 
-    private static final long serialVersionUID = 1810023906;
+    private static final long serialVersionUID = 673782475;
 
     private Long    eventId;
     private String  aggregateId;

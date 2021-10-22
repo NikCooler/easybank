@@ -21,7 +21,7 @@ import org.jooq.impl.TableRecordImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class MoneyAccountRecord extends TableRecordImpl<MoneyAccountRecord> implements Record3<UserId, Currency, BigDecimal> {
 
-    private static final long serialVersionUID = 1769054610;
+    private static final long serialVersionUID = -260854420;
 
     /**
      * Setter for <code>MONEY_ACCOUNT.USER_ID</code>.

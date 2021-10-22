@@ -17,7 +17,7 @@ import org.easybank.type.Currency;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class MoneyAccount implements Serializable {
 
-    private static final long serialVersionUID = 1012738745;
+    private static final long serialVersionUID = -1769330158;
 
     private UserId     userId;
     private Currency   currency;

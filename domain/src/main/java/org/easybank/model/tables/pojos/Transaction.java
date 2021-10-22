@@ -20,7 +20,7 @@ import org.easybank.type.TransactionType;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Transaction implements Serializable {
 
-    private static final long serialVersionUID = -564118590;
+    private static final long serialVersionUID = 584284848;
 
     private TransactionId     transactionId;
     private UserId            transferredFrom;

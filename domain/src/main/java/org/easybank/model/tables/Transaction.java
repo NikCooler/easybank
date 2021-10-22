@@ -36,7 +36,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Transaction extends TableImpl<TransactionRecord> {
 
-    private static final long serialVersionUID = 200854435;
+    private static final long serialVersionUID = -548361501;
 
     /**
      * The reference instance of <code>TRANSACTION</code>

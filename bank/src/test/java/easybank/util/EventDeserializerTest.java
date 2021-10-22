@@ -22,7 +22,7 @@ public class EventDeserializerTest {
         record.setAggregateId(USER_ID.toString());
         record.setAggregateVersion(1);
         record.setEventId(10L);
-        record.setEventType("org.craftedsw.event.UserRegisteredEvent");
+        record.setEventType("org.easybank.event.UserRegisteredEvent");
         record.setEventData("{\"email\":\"" + email + "\"}");
         record.setEventTimestamp(System.currentTimeMillis());
 
@@ -41,7 +41,7 @@ public class EventDeserializerTest {
     public void testDeserializeBrokenEventType() {
         // given
         var record = new EventStoreRecord();
-        record.setEventType("org.craftedsw.event.NotExistsEvent");
+        record.setEventType("org.easybank.event.NotExistsEvent");
 
         // when
         EventDeserializer.deserialize(record);

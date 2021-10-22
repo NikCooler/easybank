@@ -5,8 +5,8 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>org.craftedsw</groupId>
-        <artifactId>bankkata_jbehave</artifactId>
+        <groupId>org.easybank</groupId>
+        <artifactId>easybank</artifactId>
         <relativePath>../pom.xml</relativePath>
         <version>1.0</version>
     </parent>

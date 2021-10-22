@@ -29,7 +29,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class EventStore extends TableImpl<EventStoreRecord> {
 
-    private static final long serialVersionUID = -80421093;
+    private static final long serialVersionUID = -1758852566;
 
     /**
      * The reference instance of <code>EVENT_STORE</code>
