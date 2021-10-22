@@ -28,7 +28,7 @@
 
         <javalin.version>3.7.0</javalin.version>
         <slf4j.version>1.8.0-beta4</slf4j.version>
-        <jackson.version>2.10.1</jackson.version>
+        <jackson.version>2.10.5.1</jackson.version>
         <h2.version>1.4.200</h2.version>
         <jooq.version>3.13.1</jooq.version>
         <liquibase.version>3.8.7</liquibase.version>
@@ -36,7 +36,7 @@
         <unirest.java.version>3.4.00</unirest.java.version>
         <assertj.core.version>3.11.1</assertj.core.version>
         <mockito.version>3.2.4</mockito.version>
-        <junit.version>4.12</junit.version>
+        <junit.version>4.13.1</junit.version>
         <awaitability.version>4.0.3</awaitability.version>
     </properties>
 

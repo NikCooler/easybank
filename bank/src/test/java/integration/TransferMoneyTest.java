@@ -13,7 +13,6 @@ import java.util.concurrent.TimeUnit;
 
 import static org.awaitility.Awaitility.waitAtMost;
 import static org.easybank.type.Currency.EUR;
-import static org.easybank.util.SneakyThrow.doWithRuntimeException;
 import static integration.helper.MoneyTransferTestHelper.confirmTransferRequest;
 import static integration.helper.MoneyTransferTestHelper.createTransferRequest;
 import static integration.helper.MoneyTransferTestHelper.getMoneyTransferDetails;
