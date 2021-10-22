@@ -107,7 +107,7 @@
                         <manifest>
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>lib/</classpathPrefix>
-                            <mainClass>org.easybank.BankAppStarter</mainClass>
+                            <mainClass>org.easybank.EasyBankAppStarter</mainClass>
                         </manifest>
                         <manifestEntries>
                             <Class-Path>.</Class-Path>
@@ -128,7 +128,7 @@
                             <archive>
                                 <manifest>
                                     <mainClass>
-                                        org.easybank.BankAppStarter
+                                        org.easybank.EasyBankAppStarter
                                     </mainClass>
                                 </manifest>
                             </archive>

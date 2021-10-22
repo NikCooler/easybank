@@ -27,9 +27,9 @@ This app is used for:
 ## 2 How to run WITHOUT installation
 
 ```
-git clone git@github.com:NikCooler/bank-kata-f14.git
+git clone git@github.com:NikCooler/easybank.git
 
-cd bank-kata-f14
+cd easybank
 
 java -jar bank-1.0-jar-with-dependencies.jar
 ```
@@ -37,9 +37,9 @@ java -jar bank-1.0-jar-with-dependencies.jar
 ## 3 Clone, Build and Run the application
 
 ```
-git clone git@github.com:NikCooler/bank-kata-f14.git
+git clone git@github.com:NikCooler/easybank.git
 
-cd bank-kata-f14
+cd easybank
 
 mvn clean install
 
